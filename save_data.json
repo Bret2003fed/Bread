@@ -1,0 +1,358 @@
+{
+    "crumbs": 43.51399999999978,
+    "total_baked": 125.5139999999999,
+    "total_clicks": 104,
+    "total_crits": 0,
+    "total_prestiges": 0,
+    "total_jumpscares": 0,
+    "medals": 1,
+    "unlocked_artifacts": [],
+    "unlocked_achievements": [
+        "click_100"
+    ],
+    "claimed_achievements": [
+        "click_100"
+    ],
+    "current_location_idx": 0,
+    "locations": [
+        {
+            "id": "kitchen",
+            "unlocked": true,
+            "curse_level": 0.0,
+            "click_power": 1.0,
+            "passive_income": 2.5,
+            "decay_reduction": 0.0,
+            "upgrades": {
+                "sweet_tea": {
+                    "count": 2,
+                    "cost": 19
+                },
+                "toaster": {
+                    "count": 1,
+                    "cost": 57
+                },
+                "butter_knife": {
+                    "count": 0,
+                    "cost": 120
+                },
+                "mayo": {
+                    "count": 0,
+                    "cost": 350
+                },
+                "secret_recipe": {
+                    "count": 0,
+                    "cost": 1500
+                }
+            }
+        },
+        {
+            "id": "dorm",
+            "unlocked": false,
+            "curse_level": 0.0,
+            "click_power": 1.0,
+            "passive_income": 0.0,
+            "decay_reduction": 0.0,
+            "upgrades": {
+                "pan_toast": {
+                    "count": 0,
+                    "cost": 600
+                },
+                "electric_kettle": {
+                    "count": 0,
+                    "cost": 1400
+                },
+                "roommate_share": {
+                    "count": 0,
+                    "cost": 3200
+                },
+                "dorm_secret_stash": {
+                    "count": 0,
+                    "cost": 6500
+                }
+            }
+        },
+        {
+            "id": "kiosk",
+            "unlocked": false,
+            "curse_level": 0.0,
+            "click_power": 1.0,
+            "passive_income": 0.0,
+            "decay_reduction": 0.0,
+            "upgrades": {
+                "hot_dog_bun": {
+                    "count": 0,
+                    "cost": 3500
+                },
+                "coffee_machine": {
+                    "count": 0,
+                    "cost": 8500
+                },
+                "uv_lamp": {
+                    "count": 0,
+                    "cost": 18000
+                },
+                "kiosk_underground_grill": {
+                    "count": 0,
+                    "cost": 35000
+                }
+            }
+        },
+        {
+            "id": "factory",
+            "unlocked": false,
+            "curse_level": 0.0,
+            "click_power": 1.0,
+            "passive_income": 0.0,
+            "decay_reduction": 0.0,
+            "upgrades": {
+                "shaurma_bread": {
+                    "count": 0,
+                    "cost": 12000
+                },
+                "pigeon_team": {
+                    "count": 0,
+                    "cost": 28000
+                },
+                "samogon_tank": {
+                    "count": 0,
+                    "cost": 65000
+                },
+                "hyper_conveyor": {
+                    "count": 0,
+                    "cost": 150000
+                }
+            }
+        },
+        {
+            "id": "old_mill",
+            "unlocked": false,
+            "curse_level": 0.0,
+            "click_power": 1.0,
+            "passive_income": 0.0,
+            "decay_reduction": 0.0,
+            "upgrades": {
+                "stone_millstone": {
+                    "count": 0,
+                    "cost": 45000
+                },
+                "wind_catcher": {
+                    "count": 0,
+                    "cost": 110000
+                },
+                "ancient_sieve": {
+                    "count": 0,
+                    "cost": 220000
+                },
+                "spirit_wind_sieve": {
+                    "count": 0,
+                    "cost": 450000
+                }
+            }
+        },
+        {
+            "id": "bunker",
+            "unlocked": false,
+            "curse_level": 0.0,
+            "click_power": 1.0,
+            "passive_income": 0.0,
+            "decay_reduction": 0.0,
+            "upgrades": {
+                "mre_crackers": {
+                    "count": 0,
+                    "cost": 130000
+                },
+                "sealed_silo": {
+                    "count": 0,
+                    "cost": 320000
+                },
+                "cryo_freeze": {
+                    "count": 0,
+                    "cost": 600000
+                },
+                "bunker_cold_fusion": {
+                    "count": 0,
+                    "cost": 1200000
+                }
+            }
+        },
+        {
+            "id": "cyber",
+            "unlocked": false,
+            "curse_level": 0.0,
+            "click_power": 1.0,
+            "passive_income": 0.0,
+            "decay_reduction": 0.0,
+            "upgrades": {
+                "neural_oven": {
+                    "count": 0,
+                    "cost": 380000
+                },
+                "cyber_implant": {
+                    "count": 0,
+                    "cost": 850000
+                },
+                "nanobot_swarm": {
+                    "count": 0,
+                    "cost": 2100000
+                },
+                "neural_dough_matrix": {
+                    "count": 0,
+                    "cost": 4500000
+                }
+            }
+        },
+        {
+            "id": "orbital_station",
+            "unlocked": false,
+            "curse_level": 0.0,
+            "click_power": 1.0,
+            "passive_income": 0.0,
+            "decay_reduction": 0.0,
+            "upgrades": {
+                "zero_g_mixer": {
+                    "count": 0,
+                    "cost": 1200000
+                },
+                "solar_baker": {
+                    "count": 0,
+                    "cost": 3000000
+                },
+                "orbital_beam": {
+                    "count": 0,
+                    "cost": 7500000
+                },
+                "gravity_focus_lens": {
+                    "count": 0,
+                    "cost": 15000000
+                }
+            }
+        },
+        {
+            "id": "cosmic",
+            "unlocked": false,
+            "curse_level": 0.0,
+            "click_power": 1.0,
+            "passive_income": 0.0,
+            "decay_reduction": 0.0,
+            "upgrades": {
+                "kvas_reactor": {
+                    "count": 0,
+                    "cost": 3500000
+                },
+                "plasma_slicer": {
+                    "count": 0,
+                    "cost": 8500000
+                },
+                "quantum_dough_machine": {
+                    "count": 0,
+                    "cost": 22000000
+                }
+            }
+        },
+        {
+            "id": "black_hole",
+            "unlocked": false,
+            "curse_level": 0.0,
+            "click_power": 1.0,
+            "passive_income": 0.0,
+            "decay_reduction": 0.0,
+            "upgrades": {
+                "gravity_crust": {
+                    "count": 0,
+                    "cost": 12000000
+                },
+                "singularity_knife": {
+                    "count": 0,
+                    "cost": 30000000
+                },
+                "dark_matter_oven": {
+                    "count": 0,
+                    "cost": 80000000
+                },
+                "antimatter_crust_shredder": {
+                    "count": 0,
+                    "cost": 160000000
+                }
+            }
+        },
+        {
+            "id": "astral_bakery",
+            "unlocked": false,
+            "curse_level": 0.0,
+            "click_power": 1.0,
+            "passive_income": 0.0,
+            "decay_reduction": 0.0,
+            "upgrades": {
+                "soul_yeast": {
+                    "count": 0,
+                    "cost": 40000000
+                },
+                "ethereal_touch": {
+                    "count": 0,
+                    "cost": 95000000
+                },
+                "infinite_loaf": {
+                    "count": 0,
+                    "cost": 250000000
+                },
+                "astral_alchemy_cauldron": {
+                    "count": 0,
+                    "cost": 500000000
+                }
+            }
+        },
+        {
+            "id": "void",
+            "unlocked": false,
+            "curse_level": 0.0,
+            "click_power": 1.0,
+            "passive_income": 0.0,
+            "decay_reduction": 0.0,
+            "upgrades": {
+                "dark_yeast": {
+                    "count": 0,
+                    "cost": 100000000
+                },
+                "eldritch_blade": {
+                    "count": 0,
+                    "cost": 250000000
+                },
+                "void_synth": {
+                    "count": 0,
+                    "cost": 800000000
+                },
+                "void_maw_core": {
+                    "count": 0,
+                    "cost": 1800000000
+                }
+            }
+        }
+    ],
+    "prestige": {
+        "relics": 0,
+        "total_relics": 0,
+        "perk_levels": {
+            "core_seed": 0,
+            "auto_knead_1": 0,
+            "auto_knead_2": 0,
+            "crit_slicer": 0,
+            "combo_clicker": 0,
+            "hyper_conveyor_tech": 0,
+            "mold_affinity": 0,
+            "eldritch_touch": 0,
+            "mold_resonance": 0,
+            "spore_shield": 0,
+            "secret_baking_book": 0,
+            "cosmic_crust": 0,
+            "infinite_gravity": 0,
+            "antimatter_yeast": 0,
+            "black_hole_dough": 0,
+            "quantum_baking_tech": 0,
+            "bulk_discount": 0,
+            "heritage_flour": 0,
+            "night_snack": 0,
+            "golden_crunch": 0,
+            "magnetic_toast": 0
+        }
+    }
+}
