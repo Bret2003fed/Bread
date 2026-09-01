@@ -13,6 +13,7 @@ class SaveManager:
             "total_crits": game.total_crits,
             "total_prestiges": game.total_prestiges,
             "total_jumpscares": game.total_jumpscares,
+            "bought_relics_count": game.bought_relics_count,
             "medals": game.medals,
             "unlocked_artifacts": list(game.unlocked_artifacts),
             "unlocked_achievements": list(game.unlocked_achievements),
@@ -56,6 +57,7 @@ class SaveManager:
             game.total_crits = int(data.get("total_crits", 0))
             game.total_prestiges = int(data.get("total_prestiges", 0))
             game.total_jumpscares = int(data.get("total_jumpscares", 0))
+            game.bought_relics_count = int(data.get("bought_relics_count", 0))
             game.medals = int(data.get("medals", 0))
             game.unlocked_artifacts = set(data.get("unlocked_artifacts", []))
             game.unlocked_achievements = set(data.get("unlocked_achievements", []))
@@ -104,6 +106,7 @@ class SaveManager:
         game.total_crits = 0
         game.total_prestiges = 0
         game.total_jumpscares = 0
+        game.bought_relics_count = 0
         game.medals = 0
         game.unlocked_artifacts = set()
         game.unlocked_achievements = set()

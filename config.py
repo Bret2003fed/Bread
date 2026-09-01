@@ -13,7 +13,7 @@ BUTTON_BG = (48, 40, 44)
 BUTTON_HOVER = (75, 60, 65)
 BUTTON_DISABLED = (38, 32, 35)
 
-# --- 12 Локацій з унікальними прихованими будівлями ---
+# --- 12 Локацій із хардкорними цінами розблокування ---
 LOCATIONS_DATA = [
     # --- TIER 1: Побутові світи ---
     {
@@ -39,36 +39,36 @@ LOCATIONS_DATA = [
         "id": "dorm",
         "name": "Студентський Гуртожиток",
         "tier": 1,
-        "cost": 1200,
+        "cost": 25000,
         "image_file": "assets/backgrounds/dorm.png",
         "ambient": "Запах смаженого хліба на спільній плиті",
-        "curse_rate": 0.01,
-        "income_mult": 1.2,
+        "curse_rate": 0.015,
+        "income_mult": 1.5,
         "horror_type": "dorm_demon",
         "fallback_color": (35, 30, 25),
         "upgrades": {
-            "pan_toast": {"name": "Хліб на Сковорідці", "cost": 600, "growth": 1.16, "power": 6.0, "type": "passive", "desc": "Швидкий сніданок студента", "secret_req": None},
-            "electric_kettle": {"name": "Кип'ятильник у Кружці", "cost": 1400, "growth": 1.18, "power": 18.0, "type": "passive", "desc": "Гріє воду і крихти", "secret_req": None},
-            "roommate_share": {"name": "Ділитись із Сусідом", "cost": 3200, "growth": 1.20, "power": 8.0, "type": "click", "desc": "+8 до сили кліку", "secret_req": None},
-            "dorm_secret_stash": {"name": "Чайовий Фонд", "cost": 6500, "growth": 1.24, "power": 75.0, "type": "passive", "desc": "Скинулися всім поверхом на хліб", "secret_req": "auto_knead_1"},
+            "pan_toast": {"name": "Хліб на Сковорідці", "cost": 1200, "growth": 1.16, "power": 15.0, "type": "passive", "desc": "Швидкий сніданок студента", "secret_req": None},
+            "electric_kettle": {"name": "Кип'ятильник у Кружці", "cost": 3500, "growth": 1.18, "power": 45.0, "type": "passive", "desc": "Гріє воду і крихти", "secret_req": None},
+            "roommate_share": {"name": "Ділитись із Сусідом", "cost": 8000, "growth": 1.20, "power": 20.0, "type": "click", "desc": "+20 до сили кліку", "secret_req": None},
+            "dorm_secret_stash": {"name": "Чайовий Фонд", "cost": 18000, "growth": 1.24, "power": 180.0, "type": "passive", "desc": "Скинулися всім поверхом на хліб", "secret_req": "auto_knead_1"},
         }
     },
     {
         "id": "kiosk",
         "name": "Нічний Кіоск Фортуна",
         "tier": 1,
-        "cost": 6000,
+        "cost": 250000,
         "image_file": "assets/backgrounds/kiosk.png",
         "ambient": "Неонова вітрина та шум нічного міста",
-        "curse_rate": 0.02,
-        "income_mult": 1.45,
+        "curse_rate": 0.025,
+        "income_mult": 2.2,
         "horror_type": "neon_stalker",
         "fallback_color": (25, 45, 55),
         "upgrades": {
-            "hot_dog_bun": {"name": "Булочка для Хот-дога", "cost": 3500, "growth": 1.18, "power": 25.0, "type": "click", "desc": "+25 сили кліку", "secret_req": None},
-            "coffee_machine": {"name": "Автомат з Кавою", "cost": 8500, "growth": 1.20, "power": 120.0, "type": "passive", "desc": "Бадьорить покупців", "secret_req": None},
-            "uv_lamp": {"name": "УФ-Лампа", "cost": 18000, "growth": 1.24, "power": 0.10, "type": "decay_reduce", "desc": "-10% росту цвілі", "secret_req": None},
-            "kiosk_underground_grill": {"name": "Підпільний Гриль", "cost": 35000, "growth": 1.25, "power": 450.0, "type": "passive", "desc": "Нічні гарячі буханці без націнки", "secret_req": "bulk_discount"},
+            "hot_dog_bun": {"name": "Булочка для Хот-дога", "cost": 15000, "growth": 1.18, "power": 80.0, "type": "click", "desc": "+80 сили кліку", "secret_req": None},
+            "coffee_machine": {"name": "Автомат з Кавою", "cost": 45000, "growth": 1.20, "power": 400.0, "type": "passive", "desc": "Бадьорить покупців", "secret_req": None},
+            "uv_lamp": {"name": "УФ-Лампа", "cost": 90000, "growth": 1.24, "power": 0.10, "type": "decay_reduce", "desc": "-10% росту цвілі", "secret_req": None},
+            "kiosk_underground_grill": {"name": "Підпільний Гриль", "cost": 180000, "growth": 1.25, "power": 1500.0, "type": "passive", "desc": "Нічні гарячі буханці без націнки", "secret_req": "bulk_discount"},
         }
     },
 
@@ -77,54 +77,54 @@ LOCATIONS_DATA = [
         "id": "factory",
         "name": "Хлібозавод №1",
         "tier": 2,
-        "cost": 25000,
+        "cost": 2500000,
         "image_file": "assets/backgrounds/factory.png",
         "ambient": "Конвеєри гудуть на повну потужність",
-        "curse_rate": 0.025,
-        "income_mult": 1.75,
+        "curse_rate": 0.035,
+        "income_mult": 3.5,
         "horror_type": "mutant_pigeon",
         "fallback_color": (30, 40, 50),
         "upgrades": {
-            "shaurma_bread": {"name": "Шаурма в Батоні", "cost": 12000, "growth": 1.18, "power": 80.0, "type": "click", "desc": "+80 сили кліку", "secret_req": None},
-            "pigeon_team": {"name": "Зграя Голубів", "cost": 28000, "growth": 1.20, "power": 260.0, "type": "passive", "desc": "Приносять зерно на завод", "secret_req": None},
-            "samogon_tank": {"name": "Дідовий Бродильник", "cost": 65000, "growth": 1.22, "power": 750.0, "type": "passive", "desc": "Прискорює заводські печі", "secret_req": None},
-            "hyper_conveyor": {"name": "Гіпер-Конвеєр", "cost": 150000, "growth": 1.26, "power": 2500.0, "type": "passive", "desc": "Автоматизована подача тіста", "secret_req": "hyper_conveyor_tech"},
+            "shaurma_bread": {"name": "Шаурма в Батоні", "cost": 150000, "growth": 1.18, "power": 500.0, "type": "click", "desc": "+500 сили кліку", "secret_req": None},
+            "pigeon_team": {"name": "Зграя Голубів", "cost": 400000, "growth": 1.20, "power": 3500.0, "type": "passive", "desc": "Приносять зерно на завод", "secret_req": None},
+            "samogon_tank": {"name": "Дідовий Бродильник", "cost": 950000, "growth": 1.22, "power": 9500.0, "type": "passive", "desc": "Прискорює заводські печі", "secret_req": None},
+            "hyper_conveyor": {"name": "Гіпер-Конвеєр", "cost": 2000000, "growth": 1.26, "power": 30000.0, "type": "passive", "desc": "Автоматизована подача тіста", "secret_req": "hyper_conveyor_tech"},
         }
     },
     {
         "id": "old_mill",
         "name": "Покинутий Млин",
         "tier": 2,
-        "cost": 75000,
+        "cost": 25000000,
         "image_file": "assets/backgrounds/old_mill.png",
         "ambient": "Скрипучі дерев'яні жорна мелють темне борошно",
-        "curse_rate": 0.04,
-        "income_mult": 2.1,
+        "curse_rate": 0.05,
+        "income_mult": 5.0,
         "horror_type": "mill_witch",
         "fallback_color": (40, 35, 20),
         "upgrades": {
-            "stone_millstone": {"name": "Кам'яні Жорна", "cost": 45000, "growth": 1.20, "power": 650.0, "type": "passive", "desc": "Мелють цілодобово", "secret_req": None},
-            "wind_catcher": {"name": "Вітряні Лопаті", "cost": 110000, "growth": 1.22, "power": 1800.0, "type": "passive", "desc": "Сила бурі крутить млин", "secret_req": None},
-            "ancient_sieve": {"name": "Древнє Решето", "cost": 220000, "growth": 1.24, "power": 350.0, "type": "click", "desc": "+350 сили кліку", "secret_req": None},
-            "spirit_wind_sieve": {"name": "Решето Духів", "cost": 450000, "growth": 1.26, "power": 6500.0, "type": "passive", "desc": "Просіює борошно крізь простір", "secret_req": "spore_shield"},
+            "stone_millstone": {"name": "Кам'яні Жорна", "cost": 1500000, "growth": 1.20, "power": 25000.0, "type": "passive", "desc": "Мелють цілодобово", "secret_req": None},
+            "wind_catcher": {"name": "Вітряні Лопаті", "cost": 4000000, "growth": 1.22, "power": 75000.0, "type": "passive", "desc": "Сила бурі крутить млин", "secret_req": None},
+            "ancient_sieve": {"name": "Древнє Решето", "cost": 9000000, "growth": 1.24, "power": 4500.0, "type": "click", "desc": "+4500 сили кліку", "secret_req": None},
+            "spirit_wind_sieve": {"name": "Решето Духів", "cost": 20000000, "growth": 1.26, "power": 250000.0, "type": "passive", "desc": "Просіює борошно крізь простір", "secret_req": "spore_shield"},
         }
     },
     {
         "id": "bunker",
         "name": "Бункер Госрезерву",
         "tier": 2,
-        "cost": 180000,
+        "cost": 250000000,
         "image_file": "assets/backgrounds/bunker.png",
         "ambient": "Гермодвері та нескінченні ящики сухарів",
-        "curse_rate": 0.035,
-        "income_mult": 2.5,
+        "curse_rate": 0.055,
+        "income_mult": 7.5,
         "horror_type": "bunker_stalker",
         "fallback_color": (20, 28, 20),
         "upgrades": {
-            "mre_crackers": {"name": "Армійські Галети", "cost": 130000, "growth": 1.20, "power": 2400.0, "type": "passive", "desc": "Зберігаються 50 років", "secret_req": None},
-            "sealed_silo": {"name": "Гермо-Сховище", "cost": 320000, "growth": 1.22, "power": 6000.0, "type": "passive", "desc": "Тонни стратегічного зерна", "secret_req": None},
-            "cryo_freeze": {"name": "Кріо-Охолоджувач", "cost": 600000, "growth": 1.28, "power": 0.15, "type": "decay_reduce", "desc": "-15% росту цвілі в бункері", "secret_req": None},
-            "bunker_cold_fusion": {"name": "Бункерний Реактор", "cost": 1200000, "growth": 1.26, "power": 18000.0, "type": "passive", "desc": "Живить сушарки ядерною енергією", "secret_req": "heritage_flour"},
+            "mre_crackers": {"name": "Армійські Галети", "cost": 15000000, "growth": 1.20, "power": 200000.0, "type": "passive", "desc": "Зберігаються 50 років", "secret_req": None},
+            "sealed_silo": {"name": "Гермо-Сховище", "cost": 45000000, "growth": 1.22, "power": 650000.0, "type": "passive", "desc": "Тонни стратегічного зерна", "secret_req": None},
+            "cryo_freeze": {"name": "Кріо-Охолоджувач", "cost": 90000000, "growth": 1.28, "power": 0.15, "type": "decay_reduce", "desc": "-15% росту цвілі в бункері", "secret_req": None},
+            "bunker_cold_fusion": {"name": "Бункерний Реактор", "cost": 200000000, "growth": 1.26, "power": 2200000.0, "type": "passive", "desc": "Живить сушарки ядерною енергією", "secret_req": "heritage_flour"},
         }
     },
 
@@ -133,53 +133,53 @@ LOCATIONS_DATA = [
         "id": "cyber",
         "name": "Кібер-Мегаполіс 2077",
         "tier": 3,
-        "cost": 500000,
+        "cost": 2500000000,
         "image_file": "assets/backgrounds/cyber.png",
         "ambient": "Хмарочоси, неон та нейронне замішування",
-        "curse_rate": 0.06,
-        "income_mult": 3.2,
+        "curse_rate": 0.08,
+        "income_mult": 12.0,
         "horror_type": "cyber_glitch_skull",
         "fallback_color": (35, 15, 45),
         "upgrades": {
-            "neural_oven": {"name": "Нейро-Піч GPT-Loaf", "cost": 380000, "growth": 1.24, "power": 9500.0, "type": "passive", "desc": "AI знає ідеальну температуру", "secret_req": None},
-            "cyber_implant": {"name": "Біо-Клікер", "cost": 850000, "growth": 1.22, "power": 2200.0, "type": "click", "desc": "+2200 сили кліку", "secret_req": None},
-            "nanobot_swarm": {"name": "Рій Наноботів", "cost": 2100000, "growth": 1.26, "power": 32000.0, "type": "passive", "desc": "Збирають батони з атомів", "secret_req": None},
-            "neural_dough_matrix": {"name": "Нейромережа Тіста", "cost": 4500000, "growth": 1.28, "power": 75000.0, "type": "passive", "desc": "Генеративний дизайн паляниць", "secret_req": "auto_knead_2"},
+            "neural_oven": {"name": "Нейро-Піч GPT-Loaf", "cost": 180000000, "growth": 1.24, "power": 2000000.0, "type": "passive", "desc": "AI знає ідеальну температуру", "secret_req": None},
+            "cyber_implant": {"name": "Біо-Клікер", "cost": 450000000, "growth": 1.22, "power": 120000.0, "type": "click", "desc": "+120000 сили кліку", "secret_req": None},
+            "nanobot_swarm": {"name": "Рій Наноботів", "cost": 950000000, "growth": 1.26, "power": 8500000.0, "type": "passive", "desc": "Збирають батони з атомів", "secret_req": None},
+            "neural_dough_matrix": {"name": "Нейромережа Тіста", "cost": 2000000000, "growth": 1.28, "power": 25000000.0, "type": "passive", "desc": "Генеративний дизайн паляниць", "secret_req": "auto_knead_2"},
         }
     },
     {
         "id": "orbital_station",
         "name": "Станція Паляниця-1",
         "tier": 3,
-        "cost": 1500000,
+        "cost": 25000000000,
         "image_file": "assets/backgrounds/orbital.png",
         "ambient": "Невагомість і орбітальні печі",
-        "curse_rate": 0.07,
-        "income_mult": 4.0,
+        "curse_rate": 0.10,
+        "income_mult": 18.0,
         "horror_type": "zero_g_corpse",
         "fallback_color": (15, 25, 40),
         "upgrades": {
-            "zero_g_mixer": {"name": "Міксер Невагомості", "cost": 1200000, "growth": 1.24, "power": 28000.0, "type": "passive", "desc": "Тісто ширяє у вакуумі", "secret_req": None},
-            "solar_baker": {"name": "Сонячні Дзеркала", "cost": 3000000, "growth": 1.25, "power": 85000.0, "type": "passive", "desc": "Випікання енергією сонця", "secret_req": None},
-            "orbital_beam": {"name": "Орбітальний Промінь", "cost": 7500000, "growth": 1.28, "power": 220000.0, "type": "passive", "desc": "Транслює хліб на Землю", "secret_req": None},
-            "gravity_focus_lens": {"name": "Граві-Фокусувач", "cost": 15000000, "growth": 1.30, "power": 480000.0, "type": "passive", "desc": "Стискає космічне борошно променем", "secret_req": "cosmic_crust"},
+            "zero_g_mixer": {"name": "Міксер Невагомості", "cost": 1500000000, "growth": 1.24, "power": 20000000.0, "type": "passive", "desc": "Тісто ширяє у вакуумі", "secret_req": None},
+            "solar_baker": {"name": "Сонячні Дзеркала", "cost": 4500000000, "growth": 1.25, "power": 70000000.0, "type": "passive", "desc": "Випікання енергією сонця", "secret_req": None},
+            "orbital_beam": {"name": "Орбітальний Промінь", "cost": 10000000000, "growth": 1.28, "power": 200000000.0, "type": "passive", "desc": "Транслює хліб на Землю", "secret_req": None},
+            "gravity_focus_lens": {"name": "Граві-Фокусувач", "cost": 22000000000, "growth": 1.30, "power": 500000000.0, "type": "passive", "desc": "Стискає космічне борошно променем", "secret_req": "cosmic_crust"},
         }
     },
     {
         "id": "cosmic",
         "name": "Космічна Бездня",
         "tier": 3,
-        "cost": 4500000,
+        "cost": 250000000000,
         "image_file": "assets/backgrounds/cosmic.png",
         "ambient": "Гравітаційні бублики викривляють простір",
-        "curse_rate": 0.09,
-        "income_mult": 5.2,
+        "curse_rate": 0.14,
+        "income_mult": 28.0,
         "horror_type": "cosmic_eye_void",
         "fallback_color": (20, 10, 35),
         "upgrades": {
-            "kvas_reactor": {"name": "Квас-Реактор", "cost": 3500000, "growth": 1.24, "power": 110000.0, "type": "passive", "desc": "Турбіни на космічному квасі", "secret_req": None},
-            "plasma_slicer": {"name": "Плазмовий Різак", "cost": 8500000, "growth": 1.22, "power": 15000.0, "type": "click", "desc": "+15000 сили кліку", "secret_req": None},
-            "quantum_dough_machine": {"name": "Квантовий Синхронізатор", "cost": 22000000, "growth": 1.30, "power": 650000.0, "type": "passive", "desc": "Тісто існує у всіх вимірах", "secret_req": "quantum_baking_tech"},
+            "kvas_reactor": {"name": "Квас-Реактор", "cost": 15000000000, "growth": 1.24, "power": 350000000.0, "type": "passive", "desc": "Турбіни на космічному квасі", "secret_req": None},
+            "plasma_slicer": {"name": "Плазмовий Різак", "cost": 45000000000, "growth": 1.22, "power": 2500000.0, "type": "click", "desc": "+2.5M сили кліку", "secret_req": None},
+            "quantum_dough_machine": {"name": "Квантовий Синхронізатор", "cost": 150000000000, "growth": 1.30, "power": 2500000000.0, "type": "passive", "desc": "Тісто існує у всіх вимірах", "secret_req": "quantum_baking_tech"},
         }
     },
 
@@ -188,54 +188,54 @@ LOCATIONS_DATA = [
         "id": "black_hole",
         "name": "Чорна Хлібна Діра",
         "tier": 4,
-        "cost": 15000000,
+        "cost": 2500000000000,
         "image_file": "assets/backgrounds/black_hole.png",
         "ambient": "Горизонт подій затягує крихти у сингулярність",
-        "curse_rate": 0.12,
-        "income_mult": 7.0,
+        "curse_rate": 0.20,
+        "income_mult": 45.0,
         "horror_type": "event_horizon_maw",
         "fallback_color": (10, 5, 20),
         "upgrades": {
-            "gravity_crust": {"name": "Гравітаційна Скоринка", "cost": 12000000, "growth": 1.25, "power": 450000.0, "type": "passive", "desc": "Стискає енергію в хліб", "secret_req": None},
-            "singularity_knife": {"name": "Сингулярний Клинок", "cost": 30000000, "growth": 1.24, "power": 60000.0, "type": "click", "desc": "+60000 сили кліку", "secret_req": None},
-            "dark_matter_oven": {"name": "Піч Темної Матерії", "cost": 80000000, "growth": 1.28, "power": 1500000.0, "type": "passive", "desc": "Пече анти-хліб", "secret_req": None},
-            "antimatter_crust_shredder": {"name": "Антиматерійний Шредер", "cost": 160000000, "growth": 1.30, "power": 3800000.0, "type": "passive", "desc": "Розщеплює темну скоринку на чисту міць", "secret_req": "black_hole_dough"},
+            "gravity_crust": {"name": "Гравітаційна Скоринка", "cost": 150000000000, "growth": 1.25, "power": 3000000000.0, "type": "passive", "desc": "Стискає енергію в хліб", "secret_req": None},
+            "singularity_knife": {"name": "Сингулярний Клинок", "cost": 450000000000, "growth": 1.24, "power": 25000000.0, "type": "click", "desc": "+25M сили кліку", "secret_req": None},
+            "dark_matter_oven": {"name": "Піч Темної Матерії", "cost": 1200000000000, "growth": 1.28, "power": 18000000000.0, "type": "passive", "desc": "Пече анти-хліб", "secret_req": None},
+            "antimatter_crust_shredder": {"name": "Антиматерійний Шредер", "cost": 2200000000000, "growth": 1.30, "power": 45000000000.0, "type": "passive", "desc": "Розщеплює темну скоринку на чисту міць", "secret_req": "black_hole_dough"},
         }
     },
     {
         "id": "astral_bakery",
         "name": "Астральна Пекарня",
         "tier": 4,
-        "cost": 45000000,
+        "cost": 25000000000000,
         "image_file": "assets/backgrounds/astral.png",
         "ambient": "Хлібні духи замішують вічність",
-        "curse_rate": 0.15,
-        "income_mult": 9.5,
+        "curse_rate": 0.28,
+        "income_mult": 70.0,
         "horror_type": "astral_phantom",
         "fallback_color": (25, 10, 30),
         "upgrades": {
-            "soul_yeast": {"name": "Дріжджі Душ", "cost": 40000000, "growth": 1.26, "power": 1800000.0, "type": "passive", "desc": "Бродіння на духовній енергії", "secret_req": None},
-            "ethereal_touch": {"name": "Ефірний Дотик", "cost": 95000000, "growth": 1.25, "power": 180000.0, "type": "click", "desc": "+180000 сили кліку", "secret_req": None},
-            "infinite_loaf": {"name": "Нескінченна Хлібина", "cost": 250000000, "growth": 1.30, "power": 6000000.0, "type": "passive", "desc": "Ніколи не закінчується", "secret_req": None},
-            "astral_alchemy_cauldron": {"name": "Алхімічний Казан", "cost": 500000000, "growth": 1.32, "power": 14000000.0, "type": "passive", "desc": "Варить філософський буханець", "secret_req": "eldritch_touch"},
+            "soul_yeast": {"name": "Дріжджі Душ", "cost": 1500000000000, "growth": 1.26, "power": 25000000000.0, "type": "passive", "desc": "Бродіння на духовній енергії", "secret_req": None},
+            "ethereal_touch": {"name": "Ефірний Дотик", "cost": 4500000000000, "growth": 1.25, "power": 150000000.0, "type": "click", "desc": "+150M сили кліку", "secret_req": None},
+            "infinite_loaf": {"name": "Нескінченна Хлібина", "cost": 12000000000000, "growth": 1.30, "power": 120000000000.0, "type": "passive", "desc": "Ніколи не закінчується", "secret_req": None},
+            "astral_alchemy_cauldron": {"name": "Алхімічний Казан", "cost": 22000000000000, "growth": 1.32, "power": 300000000000.0, "type": "passive", "desc": "Варить філософський буханець", "secret_req": "eldritch_touch"},
         }
     },
     {
         "id": "void",
         "name": "Темний Підвал Цвілі",
         "tier": 4,
-        "cost": 120000000,
+        "cost": 250000000000000,
         "image_file": "assets/backgrounds/void.png",
         "ambient": "Абсолютна темрява (Екстремальна швидкість цвілі)",
-        "curse_rate": 0.25,
-        "income_mult": 15.0,
+        "curse_rate": 0.40,
+        "income_mult": 120.0,
         "horror_type": "eldritch_tentacle_maw",
         "fallback_color": (15, 0, 5),
         "upgrades": {
-            "dark_yeast": {"name": "Чорні Дріжджі", "cost": 100000000, "growth": 1.30, "power": 4500000.0, "type": "passive", "desc": "Заборонене бродіння (+цвіль)", "secret_req": None},
-            "eldritch_blade": {"name": "Потойбічний Тесак", "cost": 250000000, "growth": 1.28, "power": 650000.0, "type": "click", "desc": "+650000 сили кліку", "secret_req": None},
-            "void_synth": {"name": "Синтезатор Безодні", "cost": 800000000, "growth": 1.35, "power": 18000000.0, "type": "passive", "desc": "Матеріалізація чистої пітьми", "secret_req": None},
-            "void_maw_core": {"name": "Паща Небуття", "cost": 1800000000, "growth": 1.35, "power": 45000000.0, "type": "passive", "desc": "Цвіль поглинає закони фізики", "secret_req": "mold_resonance"},
+            "dark_yeast": {"name": "Чорні Дріжджі", "cost": 15000000000000, "growth": 1.30, "power": 200000000000.0, "type": "passive", "desc": "Заборонене бродіння (+цвіль)", "secret_req": None},
+            "eldritch_blade": {"name": "Потойбічний Тесак", "cost": 45000000000000, "growth": 1.28, "power": 1000000000.0, "type": "click", "desc": "+1B сили кліку", "secret_req": None},
+            "void_synth": {"name": "Синтезатор Безодні", "cost": 120000000000000, "growth": 1.35, "power": 800000000000.0, "type": "passive", "desc": "Матеріалізація чистої пітьми", "secret_req": None},
+            "void_maw_core": {"name": "Паща Небуття", "cost": 220000000000000, "growth": 1.35, "power": 2500000000000.0, "type": "passive", "desc": "Цвіль поглинає закони фізики", "secret_req": "mold_resonance"},
         }
     }
 ]
@@ -273,8 +273,9 @@ ACHIEVEMENTS_DATA = [
     {"id": "max_5_perks", "name": "Абсолютний Майстер", "desc": "Прокачати 5 різних перків до максимуму", "req_type": "max_perks_count", "req_val": 5, "reward_medals": 18},
 ]
 
-# --- Артефакти в Магазині за Медалі Пекаря ---
+# --- 16 Унікальних Артефактів у Скарбниці Медалей ---
 MEDAL_ARTIFACTS = {
+    # 1. Базовий клік
     "baker_glove": {
         "name": "Рукавичка Пекаря",
         "cost": 5,
@@ -282,13 +283,75 @@ MEDAL_ARTIFACTS = {
         "effect_type": "click_boost",
         "power": 0.50
     },
+    "diamond_whisk": {
+        "name": "Діамантовий Вінчик",
+        "cost": 20,
+        "desc": "+100% сили кліку додатково",
+        "effect_type": "click_boost",
+        "power": 1.00
+    },
+    "titanium_rolling_pin": {
+        "name": "Титанова Скалка",
+        "cost": 45,
+        "desc": "+250% сили кліку на всіх локаціях",
+        "effect_type": "click_boost",
+        "power": 2.50
+    },
+
+    # 2. Критичні кліки
+    "holy_recipe": {
+        "name": "Священний Рецепт",
+        "cost": 15,
+        "desc": "+10% до шансу критичного кліку",
+        "effect_type": "crit_boost",
+        "power": 0.10
+    },
+    "berserk_blade": {
+        "name": "Лезо Берсерка",
+        "cost": 35,
+        "desc": "Критичний множник збільшується з x5 до x10",
+        "effect_type": "crit_mult_boost",
+        "power": 5.0
+    },
+    "singularity_cleaver": {
+        "name": "Сингулярний Секач",
+        "cost": 75,
+        "desc": "Критичний множник зростає ще на +10x (до x20!)",
+        "effect_type": "crit_mult_boost",
+        "power": 10.0
+    },
+
+    # 3. Глобальний дохід
     "golden_spike": {
         "name": "Золотий Колосок",
         "cost": 10,
-        "desc": "+20% до глобального множника видобутку",
+        "desc": "+20% до глобального видобутку на всіх світах",
         "effect_type": "global_boost",
         "power": 0.20
     },
+    "cosmic_yeast": {
+        "name": "Зоряна Закваска",
+        "cost": 30,
+        "desc": "+40% до загального пасивного доходу",
+        "effect_type": "global_boost",
+        "power": 0.40
+    },
+    "eternal_dough_core": {
+        "name": "Ядро Вічного Тіста",
+        "cost": 60,
+        "desc": "+80% до всього видобутку між забігами",
+        "effect_type": "global_boost",
+        "power": 0.80
+    },
+    "philosopher_flour": {
+        "name": "Борошно Безсмертя",
+        "cost": 120,
+        "desc": "Подвоює глобальний видобуток (+100% дохід)",
+        "effect_type": "global_boost",
+        "power": 1.00
+    },
+
+    # 4. Захист від цвілі
     "thermo_chamber": {
         "name": "Термо-Сховище",
         "cost": 15,
@@ -296,16 +359,46 @@ MEDAL_ARTIFACTS = {
         "effect_type": "decay_reduce",
         "power": 0.15
     },
-    "holy_recipe": {
-        "name": "Священний Рецепт",
+    "mold_repeller": {
+        "name": "Ультразвуковий Відлякувач",
+        "cost": 40,
+        "desc": "-20% до швидкості поширення цвілі",
+        "effect_type": "decay_reduce",
+        "power": 0.20
+    },
+    "aegis_sterilizer": {
+        "name": "Стерилізатор Егіда",
+        "cost": 70,
+        "desc": "-30% до швидкості цвілі на всіх відкритих світах",
+        "effect_type": "decay_reduce",
+        "power": 0.30
+    },
+
+    # 5. Економіка, Сухарики та Старт
+    "merchant_ledger": {
+        "name": "Гільдійська Книга",
         "cost": 25,
-        "desc": "+10% до шансу критичного кліку",
-        "effect_type": "crit_boost",
-        "power": 0.10
+        "desc": "-15% знижка на купівлю всіх споруд у магазині",
+        "effect_type": "building_discount",
+        "power": 0.15
+    },
+    "relic_magnet": {
+        "name": "Сухарний Магніт",
+        "cost": 50,
+        "desc": "+1% шанс отримати Золотий Сухарик при кожному кліку",
+        "effect_type": "relic_chance_boost",
+        "power": 0.01
+    },
+    "ancestral_treasury": {
+        "name": "Скарбниця Предків",
+        "cost": 85,
+        "desc": "+25 000 стартових крихт після кожного переродження",
+        "effect_type": "start_crumbs_boost",
+        "power": 25000
     }
 }
 
-# --- Дерево Престижу (20 просторих вузлів) ---
+# --- Дерево Престижу ---
 PRESTIGE_REQ_CRUMBS = 50000
 
 PRESTIGE_TREE_DATA = {

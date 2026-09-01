@@ -35,6 +35,7 @@ class GameState:
         self.total_prestiges = 0
         self.total_jumpscares = 0
         
+        self.bought_relics_count = 0
         self.medals = 0
         self.unlocked_artifacts = set()
         self.unlocked_achievements = set()
@@ -42,13 +43,25 @@ class GameState:
         self.auto_click_timer = 0.0
         self.reset_standard_run()
 
+    def get_artifact_multiplier(self, effect_type):
+        mult = 0.0
+        for art_key in self.unlocked_artifacts:
+            if art_key in MEDAL_ARTIFACTS:
+                art = MEDAL_ARTIFACTS[art_key]
+                if art["effect_type"] == effect_type:
+                    mult += art["power"]
+        return mult
+
     def reset_standard_run(self):
-        self.crumbs = self.prestige.get_start_crumbs()
+        start_bonus = self.get_artifact_multiplier("start_crumbs_boost")
+        self.crumbs = self.prestige.get_start_crumbs() + start_bonus
         self.total_baked = self.crumbs
         self.auto_click_timer = 0.0
         self.current_location_idx = 0
 
-        cost_discount = self.prestige.get_cost_multiplier()
+        cost_discount = self.prestige.get_cost_multiplier() * (1.0 - self.get_artifact_multiplier("building_discount"))
+        cost_discount = max(0.20, cost_discount)
+
         self.locations = [LocationInstance(ld) for ld in LOCATIONS_DATA]
         for loc in self.locations:
             for k in loc.upgrades:
@@ -62,24 +75,40 @@ class GameState:
     def curse_level(self):
         return self.current_location.curse_level
 
-    def trigger_prestige(self):
-        earned = self.prestige.calculate_pending_relics(self.total_baked)
-        if earned > 0:
-            self.prestige.relics += earned
-            self.prestige.total_relics += earned
-            self.total_prestiges += 1
-            self.reset_standard_run()
+    def get_relic_buy_cost(self):
+        base_cost = 50000
+        growth_rate = 1.20
+        return int(base_cost * (growth_rate ** self.bought_relics_count))
+
+    def buy_relic_with_crumbs(self):
+        cost = self.get_relic_buy_cost()
+        if self.crumbs >= cost:
+            self.crumbs -= cost
+            self.prestige.relics += 1
+            self.prestige.total_relics += 1
+            self.bought_relics_count += 1
+            self.check_achievements()
             return True
         return False
+
+    def trigger_prestige(self):
+        self.total_prestiges += 1
+        self.reset_standard_run()
+        return True
 
     def is_upgrade_secret_unlocked(self, secret_req):
         if not secret_req:
             return True
         return self.prestige.get_perk_level(secret_req) >= 1
 
+    def can_unlock_location(self, loc_idx):
+        if loc_idx == 0:
+            return True
+        return self.locations[loc_idx - 1].unlocked
+
     def unlock_location(self, loc_idx):
         loc = self.locations[loc_idx]
-        if not loc.unlocked and self.crumbs >= loc.cost:
+        if not loc.unlocked and self.can_unlock_location(loc_idx) and self.crumbs >= loc.cost:
             self.crumbs -= loc.cost
             loc.unlocked = True
             return True
@@ -102,15 +131,6 @@ class GameState:
                 self.unlocked_artifacts.add(art_key)
                 return True
         return False
-
-    def get_artifact_multiplier(self, effect_type):
-        mult = 0.0
-        for art_key in self.unlocked_artifacts:
-            if art_key in MEDAL_ARTIFACTS:
-                art = MEDAL_ARTIFACTS[art_key]
-                if art["effect_type"] == effect_type:
-                    mult += art["power"]
-        return mult
 
     def get_location_passive(self, loc):
         if not loc.unlocked:
@@ -136,12 +156,14 @@ class GameState:
 
         crit_chance = self.prestige.get_crit_chance() + self.get_artifact_multiplier("crit_boost")
         is_crit = False
+        base_crit_mult = 5.0 + self.get_artifact_multiplier("crit_mult_boost")
+        
         if crit_chance > 0 and random.random() < crit_chance:
-            power *= 5.0
+            power *= base_crit_mult
             is_crit = True
 
         relic_dropped = False
-        relic_chance = self.prestige.get_relic_drop_chance()
+        relic_chance = self.prestige.get_relic_drop_chance() + self.get_artifact_multiplier("relic_chance_boost")
         if relic_chance > 0 and random.random() < relic_chance:
             self.prestige.relics += 1
             self.prestige.total_relics += 1
@@ -174,7 +196,7 @@ class GameState:
 
                 if loc.curse_rate > 0:
                     is_active = (i == self.current_location_idx)
-                    rate_factor = 1.0 if is_active else 0.60
+                    rate_factor = 1.0 if is_active else 0.85
                     gain = loc.curse_rate * rate_factor
                     artifact_decay_red = self.get_artifact_multiplier("decay_reduce")
                     resist = loc.decay_reduction + (1.0 - self.prestige.get_curse_resist_multiplier()) + artifact_decay_red

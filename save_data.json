@@ -1,17 +1,20 @@
 {
-    "crumbs": 43.51399999999978,
-    "total_baked": 125.5139999999999,
-    "total_clicks": 104,
+    "crumbs": 1069.2005000000024,
+    "total_baked": 8812.20049999997,
+    "total_clicks": 1246,
     "total_crits": 0,
     "total_prestiges": 0,
     "total_jumpscares": 0,
-    "medals": 1,
+    "bought_relics_count": 0,
+    "medals": 3,
     "unlocked_artifacts": [],
     "unlocked_achievements": [
-        "click_100"
+        "click_100",
+        "click_1000"
     ],
     "claimed_achievements": [
-        "click_100"
+        "click_100",
+        "click_1000"
     ],
     "current_location_idx": 0,
     "locations": [
@@ -19,25 +22,25 @@
             "id": "kitchen",
             "unlocked": true,
             "curse_level": 0.0,
-            "click_power": 1.0,
-            "passive_income": 2.5,
+            "click_power": 21.0,
+            "passive_income": 75.0,
             "decay_reduction": 0.0,
             "upgrades": {
                 "sweet_tea": {
-                    "count": 2,
-                    "cost": 19
+                    "count": 18,
+                    "cost": 152
                 },
                 "toaster": {
-                    "count": 1,
-                    "cost": 57
+                    "count": 12,
+                    "cost": 283
                 },
                 "butter_knife": {
-                    "count": 0,
-                    "cost": 120
+                    "count": 8,
+                    "cost": 443
                 },
                 "mayo": {
-                    "count": 0,
-                    "cost": 350
+                    "count": 6,
+                    "cost": 1041
                 },
                 "secret_recipe": {
                     "count": 0,
@@ -55,19 +58,19 @@
             "upgrades": {
                 "pan_toast": {
                     "count": 0,
-                    "cost": 600
+                    "cost": 1200
                 },
                 "electric_kettle": {
                     "count": 0,
-                    "cost": 1400
+                    "cost": 3500
                 },
                 "roommate_share": {
                     "count": 0,
-                    "cost": 3200
+                    "cost": 8000
                 },
                 "dorm_secret_stash": {
                     "count": 0,
-                    "cost": 6500
+                    "cost": 18000
                 }
             }
         },
@@ -81,19 +84,19 @@
             "upgrades": {
                 "hot_dog_bun": {
                     "count": 0,
-                    "cost": 3500
+                    "cost": 15000
                 },
                 "coffee_machine": {
                     "count": 0,
-                    "cost": 8500
+                    "cost": 45000
                 },
                 "uv_lamp": {
                     "count": 0,
-                    "cost": 18000
+                    "cost": 90000
                 },
                 "kiosk_underground_grill": {
                     "count": 0,
-                    "cost": 35000
+                    "cost": 180000
                 }
             }
         },
@@ -107,19 +110,19 @@
             "upgrades": {
                 "shaurma_bread": {
                     "count": 0,
-                    "cost": 12000
+                    "cost": 150000
                 },
                 "pigeon_team": {
                     "count": 0,
-                    "cost": 28000
+                    "cost": 400000
                 },
                 "samogon_tank": {
                     "count": 0,
-                    "cost": 65000
+                    "cost": 950000
                 },
                 "hyper_conveyor": {
                     "count": 0,
-                    "cost": 150000
+                    "cost": 2000000
                 }
             }
         },
@@ -133,19 +136,19 @@
             "upgrades": {
                 "stone_millstone": {
                     "count": 0,
-                    "cost": 45000
+                    "cost": 1500000
                 },
                 "wind_catcher": {
                     "count": 0,
-                    "cost": 110000
+                    "cost": 4000000
                 },
                 "ancient_sieve": {
                     "count": 0,
-                    "cost": 220000
+                    "cost": 9000000
                 },
                 "spirit_wind_sieve": {
                     "count": 0,
-                    "cost": 450000
+                    "cost": 20000000
                 }
             }
         },
@@ -159,19 +162,19 @@
             "upgrades": {
                 "mre_crackers": {
                     "count": 0,
-                    "cost": 130000
+                    "cost": 15000000
                 },
                 "sealed_silo": {
                     "count": 0,
-                    "cost": 320000
+                    "cost": 45000000
                 },
                 "cryo_freeze": {
                     "count": 0,
-                    "cost": 600000
+                    "cost": 90000000
                 },
                 "bunker_cold_fusion": {
                     "count": 0,
-                    "cost": 1200000
+                    "cost": 200000000
                 }
             }
         },
@@ -185,19 +188,19 @@
             "upgrades": {
                 "neural_oven": {
                     "count": 0,
-                    "cost": 380000
+                    "cost": 180000000
                 },
                 "cyber_implant": {
                     "count": 0,
-                    "cost": 850000
+                    "cost": 450000000
                 },
                 "nanobot_swarm": {
                     "count": 0,
-                    "cost": 2100000
+                    "cost": 950000000
                 },
                 "neural_dough_matrix": {
                     "count": 0,
-                    "cost": 4500000
+                    "cost": 2000000000
                 }
             }
         },
@@ -211,19 +214,19 @@
             "upgrades": {
                 "zero_g_mixer": {
                     "count": 0,
-                    "cost": 1200000
+                    "cost": 1500000000
                 },
                 "solar_baker": {
                     "count": 0,
-                    "cost": 3000000
+                    "cost": 4500000000
                 },
                 "orbital_beam": {
                     "count": 0,
-                    "cost": 7500000
+                    "cost": 10000000000
                 },
                 "gravity_focus_lens": {
                     "count": 0,
-                    "cost": 15000000
+                    "cost": 22000000000
                 }
             }
         },
@@ -237,15 +240,15 @@
             "upgrades": {
                 "kvas_reactor": {
                     "count": 0,
-                    "cost": 3500000
+                    "cost": 15000000000
                 },
                 "plasma_slicer": {
                     "count": 0,
-                    "cost": 8500000
+                    "cost": 45000000000
                 },
                 "quantum_dough_machine": {
                     "count": 0,
-                    "cost": 22000000
+                    "cost": 150000000000
                 }
             }
         },
@@ -259,19 +262,19 @@
             "upgrades": {
                 "gravity_crust": {
                     "count": 0,
-                    "cost": 12000000
+                    "cost": 150000000000
                 },
                 "singularity_knife": {
                     "count": 0,
-                    "cost": 30000000
+                    "cost": 450000000000
                 },
                 "dark_matter_oven": {
                     "count": 0,
-                    "cost": 80000000
+                    "cost": 1200000000000
                 },
                 "antimatter_crust_shredder": {
                     "count": 0,
-                    "cost": 160000000
+                    "cost": 2200000000000
                 }
             }
         },
@@ -285,19 +288,19 @@
             "upgrades": {
                 "soul_yeast": {
                     "count": 0,
-                    "cost": 40000000
+                    "cost": 1500000000000
                 },
                 "ethereal_touch": {
                     "count": 0,
-                    "cost": 95000000
+                    "cost": 4500000000000
                 },
                 "infinite_loaf": {
                     "count": 0,
-                    "cost": 250000000
+                    "cost": 12000000000000
                 },
                 "astral_alchemy_cauldron": {
                     "count": 0,
-                    "cost": 500000000
+                    "cost": 22000000000000
                 }
             }
         },
@@ -311,19 +314,19 @@
             "upgrades": {
                 "dark_yeast": {
                     "count": 0,
-                    "cost": 100000000
+                    "cost": 15000000000000
                 },
                 "eldritch_blade": {
                     "count": 0,
-                    "cost": 250000000
+                    "cost": 45000000000000
                 },
                 "void_synth": {
                     "count": 0,
-                    "cost": 800000000
+                    "cost": 120000000000000
                 },
                 "void_maw_core": {
                     "count": 0,
-                    "cost": 1800000000
+                    "cost": 220000000000000
                 }
             }
         }

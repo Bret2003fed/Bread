@@ -22,8 +22,6 @@ RESOLUTIONS = [
     (1920, 1080)
 ]
 
-MOLD_THRESHOLD_TREE = 70.0
-
 display_info = pygame.display.Info()
 native_w, native_h = display_info.current_w, display_info.current_h
 
@@ -36,15 +34,38 @@ screen = pygame.display.set_mode((cur_w, cur_h), pygame.FULLSCREEN | pygame.RESI
 pygame.display.set_caption("Bread Simulator: 12 Realms & Artifacts Edition")
 clock = pygame.time.Clock()
 
+def format_number(num):
+    val = float(num)
+    if val < 1000:
+        return f"{int(val)}" if val == int(val) else f"{val:.1f}"
+    
+    suffixes = [
+        (1e18, "Qi"),
+        (1e15, "Qa"),
+        (1e12, "T"),
+        (1e9, "B"),
+        (1e6, "M"),
+        (1e3, "K")
+    ]
+    for threshold, suffix in suffixes:
+        if val >= threshold:
+            formatted = f"{val / threshold:.2f}"
+            if formatted.endswith(".00"):
+                formatted = formatted[:-3]
+            elif formatted.endswith("0"):
+                formatted = formatted[:-1]
+            return f"{formatted}{suffix}"
+    return f"{int(val)}"
+
 def get_fonts(h):
-    scale = max(0.85, min(1.3, h / 800.0))
+    scale = max(0.85, min(1.25, h / 800.0))
     font_name = "Segoe UI, Arial, sans-serif"
     return {
         "splash_title": pygame.font.SysFont(font_name, int(38 * scale), bold=True),
         "title": pygame.font.SysFont(font_name, int(18 * scale), bold=True),
-        "main": pygame.font.SysFont(font_name, int(15 * scale), bold=True),
-        "small": pygame.font.SysFont(font_name, int(12 * scale)),
-        "desc": pygame.font.SysFont(font_name, int(13 * scale)),
+        "main": pygame.font.SysFont(font_name, int(14 * scale), bold=True),
+        "small": pygame.font.SysFont(font_name, int(11 * scale)),
+        "desc": pygame.font.SysFont(font_name, int(12 * scale)),
         "horror": pygame.font.SysFont("Courier New, monospace", int(17 * scale), bold=True)
     }
 
@@ -69,14 +90,14 @@ click_anim_timer = 0.0
 scroll_y = 0
 ach_scroll_y = 0
 loc_scroll_y = 0
+art_scroll_y = 0
 
-tree_notified = (game.curse_level >= MOLD_THRESHOLD_TREE)
-
-# Стани
+# Стани меню
 game_state_mode = "SPLASH"
 show_prestige_menu = False
 show_locations_hub = False
 show_achievements_hub = False
+show_artifacts_hub = False
 reset_confirm_timer = 0.0
 
 temp_fullscreen = is_fullscreen
@@ -100,6 +121,10 @@ def get_max_loc_scroll(view_height):
     total_content_h = len(game.locations) * 76 + 20
     return min(0, -(total_content_h - view_height))
 
+def get_max_art_scroll(view_height):
+    total_content_h = len(MEDAL_ARTIFACTS) * 76 + 20
+    return min(0, -(total_content_h - view_height))
+
 def apply_display_settings():
     global screen, is_fullscreen, selected_res_idx, cur_w, cur_h, fonts, horror_ending
     is_fullscreen = temp_fullscreen
@@ -121,52 +146,134 @@ def trigger_achievement_check():
         notification_banner.show(f"ДОСЯГНЕННЯ: {ach['name']}!", "Заберіть Медалі у вікні досягнень!")
         audio.play("buy")
 
-# --- Вікно Досягнень & Магазин Медалей ---
+# --- 1. Окреме Меню: Скарбниця Артефактів за Медалі ---
+def draw_artifacts_hub(surface, mouse_pos):
+    overlay = pygame.Surface((cur_w, cur_h), pygame.SRCALPHA)
+    overlay.fill((10, 8, 12, 240))
+    surface.blit(overlay, (0, 0))
+
+    box_w = min(840, cur_w - 60)
+    box_h = min(620, cur_h - 60)
+    box_rect = pygame.Rect(cur_w // 2 - box_w // 2, cur_h // 2 - box_h // 2, box_w, box_h)
+    pygame.draw.rect(surface, (28, 22, 26), box_rect, border_radius=16)
+    pygame.draw.rect(surface, (140, 90, 110), box_rect, width=2, border_radius=16)
+
+    title = fonts["title"].render("Скарбниця Артефактів (Постійні бонуси за Медалі)", True, ACCENT_GOLD)
+    surface.blit(title, (box_rect.x + 30, box_rect.y + 18))
+
+    medal_stat = f"Ваші Медалі: {format_number(game.medals)} мед."
+    m_txt = fonts["main"].render(medal_stat, True, (255, 230, 120))
+    surface.blit(m_txt, (box_rect.right - 230, box_rect.y + 20))
+
+    scroll_top = box_rect.y + 55
+    scroll_bottom = box_rect.bottom - 120
+    view_h = scroll_bottom - scroll_top
+    view_clip = pygame.Rect(box_rect.x + 15, scroll_top, box_rect.w - 30, view_h)
+    surface.set_clip(view_clip)
+
+    hovered_artifact = None
+    card_y = scroll_top + 5 + art_scroll_y
+    for art_key, art in MEDAL_ARTIFACTS.items():
+        c_rect = pygame.Rect(box_rect.x + 25, card_y, box_w - 60, 68)
+        is_bought = art_key in game.unlocked_artifacts
+        can_buy = (game.medals >= art["cost"]) and not is_bought
+
+        is_hover = view_clip.collidepoint(mouse_pos) and c_rect.collidepoint(mouse_pos)
+        if is_hover:
+            hovered_artifact = art
+
+        if is_bought:
+            bg_col = (35, 50, 38)
+            border_col = (110, 200, 130)
+        elif can_buy:
+            bg_col = (70, 52, 30)
+            border_col = ACCENT_GOLD
+        else:
+            bg_col = (28, 22, 26)
+            border_col = (60, 50, 55)
+
+        pygame.draw.rect(surface, bg_col, c_rect, border_radius=8)
+        pygame.draw.rect(surface, border_col, c_rect, width=2 if (can_buy or is_bought) else 1, border_radius=8)
+
+        status_prefix = "[АКТИВОВАНО] " if is_bought else "[АРТЕФАКТ] "
+        n_txt = fonts["main"].render(status_prefix + art["name"], True, (255, 235, 140) if (can_buy or is_bought) else (160, 150, 155))
+        surface.blit(n_txt, (c_rect.x + 15, c_rect.y + 12))
+
+        d_txt = fonts["small"].render(art["desc"], True, (220, 220, 220) if is_bought else (175, 165, 170))
+        surface.blit(d_txt, (c_rect.x + 15, c_rect.y + 38))
+
+        btn_rect = pygame.Rect(c_rect.right - 145, c_rect.y + 16, 130, 36)
+        if is_bought:
+            pygame.draw.rect(surface, (45, 65, 48), btn_rect, border_radius=6)
+            pygame.draw.rect(surface, (110, 200, 130), btn_rect, width=1, border_radius=6)
+            b_txt = fonts["small"].render("КУПЛЕНО", True, (170, 240, 170))
+        elif can_buy:
+            pulse = (math.sin(pygame.time.get_ticks() * 0.008) + 1) / 2
+            btn_col = (95 + int(35 * pulse), 70 + int(20 * pulse), 25)
+            pygame.draw.rect(surface, btn_col, btn_rect, border_radius=6)
+            pygame.draw.rect(surface, ACCENT_GOLD, btn_rect, width=2, border_radius=6)
+            b_txt = fonts["small"].render(f"КУПИТИ ({art['cost']} мед.)", True, TEXT_WHITE)
+        else:
+            pygame.draw.rect(surface, (35, 28, 32), btn_rect, border_radius=6)
+            pygame.draw.rect(surface, (55, 45, 50), btn_rect, width=1, border_radius=6)
+            b_txt = fonts["small"].render(f"{art['cost']} мед.", True, (130, 120, 125))
+
+        surface.blit(b_txt, (btn_rect.centerx - b_txt.get_width() // 2, btn_rect.centery - b_txt.get_height() // 2))
+
+        card_y += 76
+
+    surface.set_clip(None)
+
+    # Скролбар
+    max_s = get_max_art_scroll(view_h)
+    if max_s < 0:
+        bar_track = pygame.Rect(box_rect.right - 22, scroll_top, 6, view_h)
+        pygame.draw.rect(surface, (40, 32, 36), bar_track, border_radius=3)
+        thumb_h = max(25, int(view_h * (view_h / (len(MEDAL_ARTIFACTS) * 76 + 20))))
+        thumb_prog = art_scroll_y / max_s
+        thumb_y = scroll_top + int(thumb_prog * (view_h - thumb_h))
+        pygame.draw.rect(surface, ACCENT_GOLD, (box_rect.right - 22, thumb_y, 6, thumb_h), border_radius=3)
+
+    # Tooltip / Інформаційний блок опису
+    info_box = pygame.Rect(box_rect.x + 25, box_rect.bottom - 105, box_w - 180, 52)
+    pygame.draw.rect(surface, (18, 14, 16), info_box, border_radius=8)
+    pygame.draw.rect(surface, (70, 55, 60), info_box, width=1, border_radius=8)
+
+    if hovered_artifact:
+        tip_title = fonts["main"].render(f"{hovered_artifact['name']} — {hovered_artifact['cost']} Медалей", True, ACCENT_GOLD)
+        tip_desc = fonts["small"].render(f"Властивість: {hovered_artifact['desc']} (зберігається назавжди після скидань)", True, TEXT_WHITE)
+        surface.blit(tip_title, (info_box.x + 12, info_box.y + 6))
+        surface.blit(tip_desc, (info_box.x + 12, info_box.y + 28))
+    else:
+        tip_hint = fonts["small"].render("Наведіть курсор на будь-який артефакт для перегляду деталей.", True, (150, 140, 145))
+        surface.blit(tip_hint, (info_box.x + 12, info_box.y + 18))
+
+    close_btn = pygame.Rect(box_rect.right - 135, box_rect.bottom - 98, 110, 38)
+    pygame.draw.rect(surface, BUTTON_BG, close_btn, border_radius=8)
+    pygame.draw.rect(surface, PANEL_BORDER, close_btn, width=2, border_radius=8)
+    c_btn_txt = fonts["main"].render("Закрити", True, TEXT_WHITE)
+    surface.blit(c_btn_txt, (close_btn.centerx - c_btn_txt.get_width() // 2, close_btn.centery - c_btn_txt.get_height() // 2))
+
+# --- 2. Меню Досягнень ---
 def draw_achievements_hub(surface, mouse_pos):
     overlay = pygame.Surface((cur_w, cur_h), pygame.SRCALPHA)
     overlay.fill((10, 8, 12, 240))
     surface.blit(overlay, (0, 0))
 
-    box_w, box_h = min(820, cur_w - 40), min(600, cur_h - 40)
+    box_w = min(840, cur_w - 60)
+    box_h = min(620, cur_h - 60)
     box_rect = pygame.Rect(cur_w // 2 - box_w // 2, cur_h // 2 - box_h // 2, box_w, box_h)
     pygame.draw.rect(surface, (28, 22, 26), box_rect, border_radius=16)
     pygame.draw.rect(surface, (140, 90, 110), box_rect, width=2, border_radius=16)
 
-    title = fonts["title"].render("Досягнення & Магазин Медалей", True, ACCENT_GOLD)
-    surface.blit(title, (box_rect.x + 30, box_rect.y + 16))
+    title = fonts["title"].render("Список Досягнень Пекаря", True, ACCENT_GOLD)
+    surface.blit(title, (box_rect.x + 30, box_rect.y + 18))
 
-    medal_stat = f"Ваші Медалі: {game.medals} мед."
+    medal_stat = f"Ваші Медалі: {format_number(game.medals)} мед."
     m_txt = fonts["main"].render(medal_stat, True, (255, 230, 120))
-    surface.blit(m_txt, (box_rect.right - 230, box_rect.y + 18))
+    surface.blit(m_txt, (box_rect.right - 230, box_rect.y + 20))
 
-    # 1. Вівтар Артефактів
-    art_y = box_rect.y + 48
-    art_header = fonts["small"].render("Вівтар Артефактів (Постійні бонуси за Медалі):", True, (210, 200, 205))
-    surface.blit(art_header, (box_rect.x + 30, art_y))
-
-    art_x = box_rect.x + 30
-    for art_key, art in MEDAL_ARTIFACTS.items():
-        art_rect = pygame.Rect(art_x, art_y + 18, 175, 58)
-        is_bought = art_key in game.unlocked_artifacts
-        can_buy = (game.medals >= art["cost"]) and not is_bought
-
-        bg = (45, 65, 45) if is_bought else ((65, 50, 30) if can_buy else (35, 28, 32))
-        border = (120, 220, 140) if is_bought else (ACCENT_GOLD if can_buy else (60, 50, 55))
-
-        pygame.draw.rect(surface, bg, art_rect, border_radius=8)
-        pygame.draw.rect(surface, border, art_rect, width=1, border_radius=8)
-
-        n_s = fonts["small"].render(art["name"], True, TEXT_WHITE)
-        status_str = "АКТИВОВАНО" if is_bought else f"Ціна: {art['cost']} мед."
-        s_s = fonts["small"].render(status_str, True, (160, 240, 160) if is_bought else ACCENT_GOLD)
-
-        surface.blit(n_s, (art_rect.x + 8, art_rect.y + 8))
-        surface.blit(s_s, (art_rect.x + 8, art_rect.y + 30))
-
-        art_x += 185
-
-    # 2. Область скролу списку досягнень
-    scroll_top = box_rect.y + 135
+    scroll_top = box_rect.y + 55
     scroll_bottom = box_rect.bottom - 55
     view_h = scroll_bottom - scroll_top
     view_clip = pygame.Rect(box_rect.x + 15, scroll_top, box_rect.w - 30, view_h)
@@ -196,7 +303,7 @@ def draw_achievements_hub(surface, mouse_pos):
         surface.blit(n_txt, (c_rect.x + 15, c_rect.y + 10))
 
         rew_medals = ach.get("reward_medals", 1)
-        reward_desc = f"Нагорода: +{rew_medals} Медалей"
+        reward_desc = f"Нагорода: +{format_number(rew_medals)} Медалей"
         d_txt = fonts["small"].render(f"{ach['desc']} ({reward_desc})", True, (210, 210, 210) if is_unlocked else (105, 100, 105))
         surface.blit(d_txt, (c_rect.x + 15, c_rect.y + 36))
 
@@ -223,7 +330,6 @@ def draw_achievements_hub(surface, mouse_pos):
 
     surface.set_clip(None)
 
-    # Візуальна смуга скролбару
     max_s = get_max_ach_scroll(view_h)
     if max_s < 0:
         bar_track = pygame.Rect(box_rect.right - 22, scroll_top, 6, view_h)
@@ -233,20 +339,20 @@ def draw_achievements_hub(surface, mouse_pos):
         thumb_y = scroll_top + int(thumb_prog * (view_h - thumb_h))
         pygame.draw.rect(surface, ACCENT_GOLD, (box_rect.right - 22, thumb_y, 6, thumb_h), border_radius=3)
 
-    # 3. Нижня панель
     close_btn = pygame.Rect(box_rect.right - 135, box_rect.bottom - 46, 110, 36)
     pygame.draw.rect(surface, BUTTON_BG, close_btn, border_radius=8)
     pygame.draw.rect(surface, PANEL_BORDER, close_btn, width=2, border_radius=8)
     c_btn_txt = fonts["main"].render("Закрити", True, TEXT_WHITE)
     surface.blit(c_btn_txt, (close_btn.centerx - c_btn_txt.get_width() // 2, close_btn.centery - c_btn_txt.get_height() // 2))
 
-# --- Меню Карти Локацій ---
+# --- 3. Меню Карти Локацій ---
 def draw_locations_hub(surface, mouse_pos):
     overlay = pygame.Surface((cur_w, cur_h), pygame.SRCALPHA)
     overlay.fill((10, 8, 12, 240))
     surface.blit(overlay, (0, 0))
 
-    box_w, box_h = min(760, cur_w - 40), min(560, cur_h - 40)
+    box_w = min(780, cur_w - 60)
+    box_h = min(580, cur_h - 60)
     box_rect = pygame.Rect(cur_w // 2 - box_w // 2, cur_h // 2 - box_h // 2, box_w, box_h)
     pygame.draw.rect(surface, (28, 22, 26), box_rect, border_radius=16)
     pygame.draw.rect(surface, (140, 90, 110), box_rect, width=2, border_radius=16)
@@ -262,6 +368,7 @@ def draw_locations_hub(surface, mouse_pos):
     for i, loc in enumerate(game.locations):
         c_rect = pygame.Rect(box_rect.x + 25, card_y, box_w - 50, 68)
         is_current = (game.current_location_idx == i)
+        can_unlock = game.can_unlock_location(i)
 
         if is_current:
             bg_col = (65, 50, 60)
@@ -286,7 +393,7 @@ def draw_locations_hub(surface, mouse_pos):
         if loc.unlocked:
             pass_val = game.get_location_passive(loc)
             curse_str = "Без цвілі" if loc.curse_rate == 0 else f"Цвіль: {int(loc.curse_level)}%"
-            stat_txt = fonts["small"].render(f"Пасив: {pass_val:.1f} кр/сек | {curse_str}", True, (190, 240, 190))
+            stat_txt = fonts["small"].render(f"Пасив: {format_number(pass_val)}/с | {curse_str}", True, (190, 240, 190))
             surface.blit(stat_txt, (c_rect.x + 15, c_rect.y + 46))
 
             btn_rect = pygame.Rect(c_rect.right - 135, c_rect.y + 16, 120, 36)
@@ -296,12 +403,23 @@ def draw_locations_hub(surface, mouse_pos):
             b_lbl = fonts["small"].render("АКТИВНА" if is_current else "Перейти ->", True, TEXT_WHITE)
             surface.blit(b_lbl, (btn_rect.centerx - b_lbl.get_width() // 2, btn_rect.centery - b_lbl.get_height() // 2))
         else:
-            can_buy = (game.crumbs >= loc.cost)
-            btn_rect = pygame.Rect(c_rect.right - 170, c_rect.y + 16, 155, 36)
-            btn_col = (95, 65, 30) if can_buy else (45, 35, 40)
+            can_buy = (game.crumbs >= loc.cost) and can_unlock
+            btn_rect = pygame.Rect(c_rect.right - 185, c_rect.y + 16, 170, 36)
+            
+            if not can_unlock:
+                btn_col = (35, 28, 32)
+                border_col = (55, 45, 50)
+                b_lbl_str = f"[!] Відкрийте світ {i}"
+                lbl_color = (130, 110, 115)
+            else:
+                btn_col = (95, 65, 30) if can_buy else (45, 35, 40)
+                border_col = ACCENT_GOLD if can_buy else (70, 60, 65)
+                b_lbl_str = f"Купити ({format_number(loc.cost)} кр.)"
+                lbl_color = TEXT_WHITE if can_buy else (130, 120, 125)
+
             pygame.draw.rect(surface, btn_col, btn_rect, border_radius=6)
-            pygame.draw.rect(surface, ACCENT_GOLD if can_buy else (70, 60, 65), btn_rect, width=2, border_radius=6)
-            b_lbl = fonts["small"].render(f"Купити ({loc.cost} кр.)", True, TEXT_WHITE if can_buy else (130, 120, 125))
+            pygame.draw.rect(surface, border_col, btn_rect, width=2, border_radius=8)
+            b_lbl = fonts["small"].render(b_lbl_str, True, lbl_color)
             surface.blit(b_lbl, (btn_rect.centerx - b_lbl.get_width() // 2, btn_rect.centery - b_lbl.get_height() // 2))
 
         card_y += 76
@@ -314,11 +432,12 @@ def draw_locations_hub(surface, mouse_pos):
     c_txt = fonts["main"].render("Закрити", True, TEXT_WHITE)
     surface.blit(c_txt, (close_btn.centerx - c_txt.get_width() // 2, close_btn.centery - c_txt.get_height() // 2))
 
-# --- Меню Налаштувань ---
+# --- 4. Меню Налаштувань ---
 def draw_settings_page(surface, mouse_pos):
     surface.fill((18, 14, 18))
 
-    box_w, box_h = min(560, cur_w - 60), min(520, cur_h - 60)
+    box_w = min(560, cur_w - 60)
+    box_h = min(520, cur_h - 60)
     box_rect = pygame.Rect(cur_w // 2 - box_w // 2, cur_h // 2 - box_h // 2, box_w, box_h)
     pygame.draw.rect(surface, (28, 22, 26), box_rect, border_radius=16)
     pygame.draw.rect(surface, (140, 90, 110), box_rect, width=2, border_radius=16)
@@ -389,7 +508,7 @@ def draw_settings_page(surface, mouse_pos):
     b_txt = fonts["main"].render("Назад", True, TEXT_WHITE)
     surface.blit(b_txt, (back_btn.centerx - b_txt.get_width() // 2, back_btn.centery - b_txt.get_height() // 2))
 
-# --- Дерево Престижу ---
+# --- 5. Дерево Престижу ---
 def draw_radial_prestige_tree(surface, mouse_pos):
     global selected_perk_id, tree_pan_x, tree_pan_y
 
@@ -397,14 +516,16 @@ def draw_radial_prestige_tree(surface, mouse_pos):
     overlay.fill((10, 8, 12, 240))
     surface.blit(overlay, (0, 0))
 
-    box_rect = pygame.Rect(50, 30, cur_w - 100, cur_h - 60)
+    box_rect = pygame.Rect(40, 30, cur_w - 80, cur_h - 60)
     pygame.draw.rect(surface, (25, 20, 24), box_rect, border_radius=16)
     pygame.draw.rect(surface, (120, 80, 95), box_rect, width=2, border_radius=16)
 
-    title = fonts["title"].render("Дерево Еволюції Випічки", True, ACCENT_GOLD)
+    title = fonts["title"].render("Дерево Еволюції & Обмінник Сухариків", True, ACCENT_GOLD)
     surface.blit(title, (box_rect.x + 25, box_rect.y + 18))
-    relic_txt = fonts["main"].render(f"Золоті Сухарики: {game.prestige.relics}", True, (255, 220, 120))
-    surface.blit(relic_txt, (box_rect.right - 260, box_rect.y + 22))
+    
+    top_stat_str = f"Золоті Сухарики: {format_number(game.prestige.relics)}"
+    relic_txt = fonts["main"].render(top_stat_str, True, (255, 220, 120))
+    surface.blit(relic_txt, (box_rect.right - relic_txt.get_width() - 25, box_rect.y + 20))
 
     viewport_rect = pygame.Rect(box_rect.x + 10, box_rect.y + 55, box_rect.w - 20, box_rect.h - 225)
     view_surf = pygame.Surface((viewport_rect.w, viewport_rect.h))
@@ -483,7 +604,7 @@ def draw_radial_prestige_tree(surface, mouse_pos):
         lvl_str = f"Рівень: {lvl}/{max_l}" if not is_max else "МАКС. РІВЕНЬ"
         l_surf = fonts["small"].render(lvl_str, True, (190, 240, 190) if lvl > 0 else (175, 165, 170))
 
-        cost_str = "ВІДКРИТО" if is_max else f"Ціна: {game.prestige.get_perk_cost(key)} Сух."
+        cost_str = "ВІДКРИТО" if is_max else f"Ціна: {format_number(game.prestige.get_perk_cost(key))} Сух."
         c_surf = fonts["small"].render(cost_str, True, (255, 220, 130) if not is_max else (160, 220, 160))
 
         view_surf.blit(n_surf, (node_rect.x + (node_w - n_surf.get_width()) // 2, node_rect.y + 8))
@@ -502,7 +623,7 @@ def draw_radial_prestige_tree(surface, mouse_pos):
         info_perk = game.prestige.tree_config[active_detail_id]
         cur_l = game.prestige.get_perk_level(active_detail_id)
         max_l = info_perk["max_level"]
-        cost_info = " [МАКСИМАЛЬНИЙ РІВЕНЬ]" if cur_l >= max_l else f" (Наступний рівень: {game.prestige.get_perk_cost(active_detail_id)} Сух.)"
+        cost_info = " [МАКСИМАЛЬНИЙ РІВЕНЬ]" if cur_l >= max_l else f" (Наступний рівень: {format_number(game.prestige.get_perk_cost(active_detail_id))} Сух.)"
         
         h_surf = fonts["main"].render(f"Гілка: {info_perk['branch']} | {info_perk['name']} [{cur_l}/{max_l}]{cost_info}", True, ACCENT_GOLD)
         d_surf = fonts["desc"].render(f"{info_perk['desc']} (Бонус діє миттєво)", True, TEXT_WHITE)
@@ -518,27 +639,43 @@ def draw_radial_prestige_tree(surface, mouse_pos):
         hint = fonts["desc"].render("Клікайте по вузлу для підвищення рівня. Бонуси починають діяти одразу!", True, (150, 140, 150))
         surface.blit(hint, (info_rect.x + 15, info_rect.y + 35))
 
-    can_prestige_now = (game.curse_level >= MOLD_THRESHOLD_TREE)
-    pending = game.prestige.calculate_pending_relics(game.total_baked)
-    
-    prestige_btn = pygame.Rect(box_rect.x + 25, box_rect.bottom - 55, 340, 40)
-    
-    if can_prestige_now:
-        btn_col = (140, 45, 60) if pending > 0 else (60, 40, 45)
-        p_label = f"ПЕРЕРОДИТИСЯ (+{pending} Сухариків)"
-        border_col = ACCENT_GOLD if pending > 0 else (90, 60, 70)
+    is_fully_cursed = (game.curse_level >= 100.0)
+
+    # Кнопка Переродження
+    prestige_btn = pygame.Rect(box_rect.x + 25, box_rect.bottom - 55, 300, 42)
+    if is_fully_cursed:
+        btn_col = (140, 45, 60)
+        p_label = "ПЕРЕРОДИТИСЯ (Очистити цвіль)"
+        border_col = ACCENT_GOLD
     else:
         btn_col = (38, 30, 35)
-        p_label = "[!] ПОТРІБНО 70% ЦВІЛІ ДЛЯ РЕСЕТУ"
+        p_label = "[!] ПОТРІБНО 100% ЦВІЛІ"
         border_col = (65, 50, 55)
 
     pygame.draw.rect(surface, btn_col, prestige_btn, border_radius=8)
     pygame.draw.rect(surface, border_col, prestige_btn, width=2, border_radius=8)
-
-    p_txt = fonts["main"].render(p_label, True, TEXT_WHITE if can_prestige_now else (140, 130, 135))
+    p_txt = fonts["main"].render(p_label, True, TEXT_WHITE if is_fully_cursed else (140, 130, 135))
     surface.blit(p_txt, (prestige_btn.centerx - p_txt.get_width() // 2, prestige_btn.centery - p_txt.get_height() // 2))
 
-    close_btn = pygame.Rect(box_rect.right - 140, box_rect.bottom - 55, 115, 40)
+    # Кнопка Купівлі Золотого Сухарика
+    relic_buy_cost = game.get_relic_buy_cost()
+    can_buy_relic = is_fully_cursed and (game.crumbs >= relic_buy_cost)
+    buy_relic_btn = pygame.Rect(box_rect.x + 340, box_rect.bottom - 55, 360, 42)
+    
+    if is_fully_cursed:
+        pygame.draw.rect(surface, (95, 65, 25) if can_buy_relic else (45, 35, 25), buy_relic_btn, border_radius=8)
+        pygame.draw.rect(surface, ACCENT_GOLD if can_buy_relic else (80, 65, 40), buy_relic_btn, width=2, border_radius=8)
+        r_buy_label = f"Купити +1 Сухарик: {format_number(relic_buy_cost)} кр."
+        r_buy_txt = fonts["small"].render(r_buy_label, True, (255, 235, 140) if can_buy_relic else (160, 145, 130))
+    else:
+        pygame.draw.rect(surface, (38, 30, 35), buy_relic_btn, border_radius=8)
+        pygame.draw.rect(surface, (65, 50, 55), buy_relic_btn, width=2, border_radius=8)
+        r_buy_label = "[!] ОБМІН ВІДКРИЄТЬСЯ ПРИ 100% ЦВІЛІ"
+        r_buy_txt = fonts["small"].render(r_buy_label, True, (140, 130, 135))
+
+    surface.blit(r_buy_txt, (buy_relic_btn.centerx - r_buy_txt.get_width() // 2, buy_relic_btn.centery - r_buy_txt.get_height() // 2))
+
+    close_btn = pygame.Rect(box_rect.right - 130, box_rect.bottom - 55, 105, 42)
     pygame.draw.rect(surface, BUTTON_BG, close_btn, border_radius=8)
     pygame.draw.rect(surface, PANEL_BORDER, close_btn, width=2, border_radius=8)
     c_txt = fonts["main"].render("Закрити", True, TEXT_WHITE)
@@ -554,7 +691,7 @@ def draw_splash_screen(surface, t, mouse_pos):
     surface.blit(scaled_logo, scaled_logo.get_rect(center=(cur_w // 2, cur_h // 2 - 80)))
 
     title = fonts["splash_title"].render("BREAD SIMULATOR", True, ACCENT_GOLD)
-    sub = fonts["main"].render("Hardcore Achievements & Medal Artifacts Edition", True, (210, 190, 200))
+    sub = fonts["main"].render("Hardcore Achievements & Artifacts Edition", True, (210, 190, 200))
     surface.blit(title, (cur_w // 2 - title.get_width() // 2, cur_h // 2 + 70))
     surface.blit(sub, (cur_w // 2 - sub.get_width() // 2, cur_h // 2 + 120))
 
@@ -593,34 +730,36 @@ while running:
 
     notification_banner.update(dt)
 
-    shop_w = min(400, max(320, int(cur_w * 0.30)))
+    shop_w = min(420, max(310, int(cur_w * 0.28)))
     shop_x = cur_w - shop_w - 20
-    bread_center = (shop_x // 2, cur_h // 2 + 30)
-    base_bread_size = (int(min(320, cur_w * 0.28)), int(min(180, cur_h * 0.25)))
+    
+    left_panel_w = 300
+    left_panel_x = 20
+
+    center_space_left = left_panel_x + left_panel_w
+    center_space_right = shop_x
+    bread_center = (center_space_left + (center_space_right - center_space_left) // 2, cur_h // 2 + 35)
+
+    base_bread_size = (
+        min(380, max(260, int((center_space_right - center_space_left) * 0.55))),
+        min(220, max(150, int(cur_h * 0.28)))
+    )
 
     if game_state_mode == "SPLASH":
         splash_timer += dt
     elif game_state_mode == "PLAYING":
         if horror_ending.active:
             horror_ending.update(dt)
-        elif not show_prestige_menu and not show_locations_hub and not show_achievements_hub:
+        elif not show_prestige_menu and not show_locations_hub and not show_achievements_hub and not show_artifacts_hub:
             game.update_passive(dt)
 
-            if game.curse_level >= MOLD_THRESHOLD_TREE and not tree_notified:
-                tree_notified = True
-                notification_banner.show(
-                    "[!] ПЕРЕРОДЖЕННЯ ДОСТУПНЕ!", 
-                    "Рівень цвілі досяг 70% — тепер можна скинути забіг за Сухарики!"
-                )
-                audio.play("buy")
-
-            if game.curse_level >= 100.0:
+            if game.curse_level >= 100.0 and not horror_ending.active:
                 game.total_jumpscares += 1
                 trigger_achievement_check()
                 horror_ending.trigger(game.current_location.horror_type)
                 audio.play("horror")
 
-    # Тряска камери
+    # Тряска камери під час хорору
     if game_state_mode == "PLAYING":
         if horror_ending.active and horror_ending.timer < 1.2:
             shake_x, shake_y = random.randint(-16, 16), random.randint(-16, 16)
@@ -653,29 +792,45 @@ while running:
                     show_locations_hub = False
                 elif show_achievements_hub:
                     show_achievements_hub = False
+                elif show_artifacts_hub:
+                    show_artifacts_hub = False
                 elif game_state_mode == "SPLASH":
                     running = False
 
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            if show_achievements_hub:
-                box_w, box_h = min(820, cur_w - 40), min(600, cur_h - 40)
-                box_rect = pygame.Rect(cur_w // 2 - box_w // 2, cur_h // 2 - box_h // 2, box_w, box_h)
-                scroll_top = box_rect.y + 135
-                scroll_bottom = box_rect.bottom - 55
+            if horror_ending.active:
+                if horror_cta_btn_rect and horror_cta_btn_rect.collidepoint(mouse_pos):
+                    horror_ending.active = False
+                    show_prestige_menu = True
 
-                # Клік купівлі Артефакту за Медалі
-                art_y = box_rect.y + 48
-                art_x = box_rect.x + 30
+            elif show_artifacts_hub:
+                box_w = min(840, cur_w - 60)
+                box_h = min(620, cur_h - 60)
+                box_rect = pygame.Rect(cur_w // 2 - box_w // 2, cur_h // 2 - box_h // 2, box_w, box_h)
+                scroll_top = box_rect.y + 55
+                scroll_bottom = box_rect.bottom - 120
+
+                card_y = scroll_top + 5 + art_scroll_y
                 for art_key in MEDAL_ARTIFACTS:
-                    art_rect = pygame.Rect(art_x, art_y + 18, 175, 58)
-                    if art_rect.collidepoint(mouse_pos):
+                    btn_rect = pygame.Rect(box_rect.x + box_w - 180, card_y + 16, 130, 36)
+                    if btn_rect.collidepoint(mouse_pos) and (scroll_top <= mouse_pos[1] <= scroll_bottom):
                         if game.buy_artifact(art_key):
                             audio.play("buy")
                             SaveManager.save_game(game)
                             floating_texts.append(FloatingText("АРТЕФАКТ АКТИВОВАНО!", mouse_pos[0], mouse_pos[1] - 20, fonts["main"], (140, 240, 160)))
-                    art_x += 185
+                    card_y += 76
 
-                # Клік отримання нагороди в досягненнях
+                close_btn = pygame.Rect(box_rect.right - 135, box_rect.bottom - 98, 110, 38)
+                if close_btn.collidepoint(mouse_pos):
+                    show_artifacts_hub = False
+
+            elif show_achievements_hub:
+                box_w = min(840, cur_w - 60)
+                box_h = min(620, cur_h - 60)
+                box_rect = pygame.Rect(cur_w // 2 - box_w // 2, cur_h // 2 - box_h // 2, box_w, box_h)
+                scroll_top = box_rect.y + 55
+                scroll_bottom = box_rect.bottom - 55
+
                 card_y = scroll_top + 5 + ach_scroll_y
                 for ach in ACHIEVEMENTS_DATA:
                     btn_rect = pygame.Rect(box_rect.x + box_w - 180, card_y + 16, 130, 36)
@@ -684,7 +839,7 @@ while running:
                         if claimed_ach:
                             audio.play("buy")
                             SaveManager.save_game(game)
-                            floating_texts.append(FloatingText(f"+{claimed_ach.get('reward_medals', 1)} МЕДАЛЕЙ!", mouse_pos[0], mouse_pos[1] - 20, fonts["main"], ACCENT_GOLD))
+                            floating_texts.append(FloatingText(f"+{format_number(claimed_ach.get('reward_medals', 1))} МЕДАЛЕЙ!", mouse_pos[0], mouse_pos[1] - 20, fonts["main"], ACCENT_GOLD))
                     card_y += 76
 
                 close_btn = pygame.Rect(box_rect.right - 135, box_rect.bottom - 46, 110, 36)
@@ -692,7 +847,8 @@ while running:
                     show_achievements_hub = False
 
             elif show_locations_hub:
-                box_w, box_h = min(760, cur_w - 40), min(560, cur_h - 40)
+                box_w = min(780, cur_w - 60)
+                box_h = min(580, cur_h - 60)
                 box_rect = pygame.Rect(cur_w // 2 - box_w // 2, cur_h // 2 - box_h // 2, box_w, box_h)
                 
                 card_y = box_rect.y + 55 + loc_scroll_y
@@ -704,12 +860,13 @@ while running:
                             game.current_location_idx = i
                             audio.play("click")
                     else:
-                        btn_rect = pygame.Rect(c_rect.right - 170, c_rect.y + 16, 155, 36)
+                        btn_rect = pygame.Rect(c_rect.right - 185, c_rect.y + 16, 170, 36)
                         if btn_rect.collidepoint(mouse_pos) and (box_rect.y + 50 <= mouse_pos[1] <= box_rect.bottom - 50):
-                            if game.unlock_location(i):
-                                game.current_location_idx = i
-                                audio.play("buy")
-                                trigger_achievement_check()
+                            if game.can_unlock_location(i):
+                                if game.unlock_location(i):
+                                    game.current_location_idx = i
+                                    audio.play("buy")
+                                    trigger_achievement_check()
                     card_y += 76
 
                 close_btn = pygame.Rect(box_rect.right - 135, box_rect.bottom - 45, 110, 35)
@@ -717,7 +874,8 @@ while running:
                     show_locations_hub = False
 
             elif game_state_mode == "SETTINGS_PAGE":
-                box_w, box_h = min(560, cur_w - 60), min(520, cur_h - 60)
+                box_w = min(560, cur_w - 60)
+                box_h = min(520, cur_h - 60)
                 box_rect = pygame.Rect(cur_w // 2 - box_w // 2, cur_h // 2 - box_h // 2, box_w, box_h)
 
                 fs_btn = pygame.Rect(box_rect.x + 190, box_rect.y + 68, 130, 36)
@@ -742,7 +900,6 @@ while running:
                 if reset_btn.collidepoint(mouse_pos):
                     if reset_confirm_timer > 0:
                         SaveManager.reset_save(game)
-                        tree_notified = False
                         reset_confirm_timer = 0.0
                     else:
                         reset_confirm_timer = 3.0
@@ -773,13 +930,8 @@ while running:
                     temp_res_idx = selected_res_idx
                     game_state_mode = "SETTINGS_PAGE"
 
-            elif horror_ending.active:
-                if horror_cta_btn_rect and horror_cta_btn_rect.collidepoint(mouse_pos):
-                    horror_ending.active = False
-                    show_prestige_menu = True
-
             elif show_prestige_menu:
-                box_rect = pygame.Rect(50, 30, cur_w - 100, cur_h - 60)
+                box_rect = pygame.Rect(40, 30, cur_w - 80, cur_h - 60)
                 viewport_rect = pygame.Rect(box_rect.x + 10, box_rect.y + 55, box_rect.w - 20, box_rect.h - 225)
                 
                 if viewport_rect.collidepoint(mouse_pos):
@@ -788,37 +940,51 @@ while running:
                     drag_start_pan = (tree_pan_x, tree_pan_y)
                     has_dragged = False
 
-                prestige_btn = pygame.Rect(box_rect.x + 25, box_rect.bottom - 55, 340, 40)
-                if prestige_btn.collidepoint(mouse_pos) and (game.curse_level >= MOLD_THRESHOLD_TREE):
+                prestige_btn = pygame.Rect(box_rect.x + 25, box_rect.bottom - 55, 300, 42)
+                if prestige_btn.collidepoint(mouse_pos) and (game.curse_level >= 100.0):
                     if game.trigger_prestige():
                         SaveManager.save_game(game)
-                        tree_notified = False
                         show_prestige_menu = False
                         trigger_achievement_check()
 
-                close_btn = pygame.Rect(box_rect.right - 140, box_rect.bottom - 55, 115, 40)
+                buy_relic_btn = pygame.Rect(box_rect.x + 340, box_rect.bottom - 55, 360, 42)
+                if buy_relic_btn.collidepoint(mouse_pos) and (game.curse_level >= 100.0):
+                    if game.buy_relic_with_crumbs():
+                        audio.play("buy")
+                        SaveManager.save_game(game)
+                        floating_texts.append(FloatingText("+1 СУХАРИК!", mouse_pos[0], mouse_pos[1] - 25, fonts["main"], (255, 230, 80)))
+
+                close_btn = pygame.Rect(box_rect.right - 130, box_rect.bottom - 55, 105, 42)
                 if close_btn.collidepoint(mouse_pos):
                     show_prestige_menu = False
             else:
-                map_btn_rect = pygame.Rect(25, 18, 290, 30)
+                # 1. Кнопка Карти
+                map_btn_rect = pygame.Rect(left_panel_x + 10, 18, left_panel_w - 20, 30)
                 if map_btn_rect.collidepoint(mouse_pos):
                     show_locations_hub = True
 
-                ach_btn_rect = pygame.Rect(25, 195, 135, 34)
+                # 2. Ряд 1: Досягнення та Скарбниця Артефактів
+                btn_half_w = (left_panel_w - 30) // 2
+                ach_btn_rect = pygame.Rect(left_panel_x + 10, 196, btn_half_w, 32)
                 if ach_btn_rect.collidepoint(mouse_pos):
                     show_achievements_hub = True
 
-                p_open_rect = pygame.Rect(170, 195, 145, 34)
+                art_btn_rect = pygame.Rect(left_panel_x + 10 + btn_half_w + 10, 196, btn_half_w, 32)
+                if art_btn_rect.collidepoint(mouse_pos):
+                    show_artifacts_hub = True
+
+                # 3. Ряд 2: Дерево Престижу та Меню
+                p_open_rect = pygame.Rect(left_panel_x + 10, 234, btn_half_w, 32)
                 if p_open_rect.collidepoint(mouse_pos):
                     show_prestige_menu = True
 
-                s_open_rect = pygame.Rect(25, 236, 290, 28)
+                s_open_rect = pygame.Rect(left_panel_x + 10 + btn_half_w + 10, 234, btn_half_w, 32)
                 if s_open_rect.collidepoint(mouse_pos):
                     temp_fullscreen = is_fullscreen
                     temp_res_idx = selected_res_idx
                     game_state_mode = "SETTINGS_PAGE"
 
-                # Фізичний клік по хлібині
+                # Фізичний клік по батону
                 current_center = (bread_center[0] + shake_x, bread_center[1] + shake_y)
                 bread_rect = pygame.Rect(
                     current_center[0] - (base_bread_size[0] * scale_factor) / 2,
@@ -842,7 +1008,7 @@ while running:
                         floating_texts.append(FloatingText("+1 СУХАРИК!", mouse_pos[0], mouse_pos[1] - 25, fonts["main"], (255, 230, 100)))
                         audio.play("buy")
 
-                    label = f"КРИТ! +{int(click_val)}" if is_crit else f"+{int(click_val)}"
+                    label = f"КРИТ! +{format_number(click_val)}" if is_crit else f"+{format_number(click_val)}"
                     txt_color = (255, 50, 50) if is_crit else ((255, 80, 80) if game.curse_level > 60 else ACCENT_GOLD)
                     floating_texts.append(FloatingText(label, mouse_pos[0], mouse_pos[1], fonts["main"], txt_color))
                     
@@ -871,7 +1037,7 @@ while running:
             if show_prestige_menu and is_dragging_tree:
                 is_dragging_tree = False
                 if not has_dragged:
-                    box_rect = pygame.Rect(50, 30, cur_w - 100, cur_h - 60)
+                    box_rect = pygame.Rect(40, 30, cur_w - 80, cur_h - 60)
                     viewport_rect = pygame.Rect(box_rect.x + 10, box_rect.y + 55, box_rect.w - 20, box_rect.h - 225)
                     origin_x = viewport_rect.w // 2 + int(tree_pan_x)
                     origin_y = viewport_rect.h // 2 + int(tree_pan_y)
@@ -893,13 +1059,18 @@ while running:
                             break
 
         elif event.type == pygame.MOUSEWHEEL:
-            if show_achievements_hub:
-                box_h_cur = min(600, cur_h - 40)
-                view_h_cur = (box_h_cur - 55) - 135
+            if show_artifacts_hub:
+                box_h_cur = min(620, cur_h - 60)
+                view_h_cur = (box_h_cur - 120) - 55
+                max_s = get_max_art_scroll(view_h_cur)
+                art_scroll_y = max(max_s, min(0, art_scroll_y + event.y * 40))
+            elif show_achievements_hub:
+                box_h_cur = min(620, cur_h - 60)
+                view_h_cur = (box_h_cur - 55) - 55
                 max_s = get_max_ach_scroll(view_h_cur)
                 ach_scroll_y = max(max_s, min(0, ach_scroll_y + event.y * 40))
             elif show_locations_hub:
-                box_h_cur = min(560, cur_h - 40)
+                box_h_cur = min(580, cur_h - 60)
                 view_h_cur = box_h_cur - 105
                 max_s = get_max_loc_scroll(view_h_cur)
                 loc_scroll_y = max(max_s, min(0, loc_scroll_y + event.y * 35))
@@ -908,7 +1079,7 @@ while running:
                 if shop_rect.collidepoint(mouse_pos):
                     scroll_y = max(-600, min(0, scroll_y + event.y * 25))
 
-    # --- Отрисовка ---
+    # --- Отрисовка на екран ---
     if game_state_mode == "SPLASH":
         draw_splash_screen(screen, splash_timer, mouse_pos)
     elif game_state_mode == "SETTINGS_PAGE":
@@ -928,82 +1099,89 @@ while running:
             bg_surface = pygame.transform.smoothscale(bg_surface, (cur_w, cur_h))
         screen.blit(bg_surface, (0, 0))
 
-        # Панель статистики ліворуч
-        ui_overlay = pygame.Surface((310, 280), pygame.SRCALPHA)
+        # Панель статистики ліворуч (300px)
+        ui_overlay = pygame.Surface((left_panel_w, 280), pygame.SRCALPHA)
         ui_overlay.fill((15, 12, 15, 215))
-        screen.blit(ui_overlay, (15, 10))
-        pygame.draw.rect(screen, (70, 60, 65), (15, 10, 310, 280), width=1, border_radius=10)
+        screen.blit(ui_overlay, (left_panel_x, 10))
+        pygame.draw.rect(screen, (70, 60, 65), (left_panel_x, 10, left_panel_w, 280), width=1, border_radius=10)
 
-        map_btn_rect = pygame.Rect(25, 18, 290, 30)
+        map_btn_rect = pygame.Rect(left_panel_x + 10, 18, left_panel_w - 20, 30)
         pygame.draw.rect(screen, BUTTON_BG, map_btn_rect, border_radius=6)
         pygame.draw.rect(screen, ACCENT_GOLD, map_btn_rect, width=1, border_radius=6)
         m_txt = fonts["small"].render(f"Світ: {game.current_location.name} [Змінити]", True, ACCENT_GOLD)
         screen.blit(m_txt, (map_btn_rect.centerx - m_txt.get_width() // 2, map_btn_rect.centery - m_txt.get_height() // 2))
 
-        crumb_title = fonts["title"].render(f"Крихти: {int(game.crumbs):,}".replace(",", " "), True, ACCENT_GOLD)
-        stat_cps = fonts["main"].render(f"Всього пасив: {game.get_total_passive_income():.1f} кр/сек", True, TEXT_WHITE)
-        stat_click = fonts["main"].render(f"Сила кліку: +{int(game.get_effective_click_power())}", True, TEXT_WHITE)
-        screen.blit(crumb_title, (30, 56))
-        screen.blit(stat_cps, (30, 88))
-        screen.blit(stat_click, (30, 114))
+        crumb_title = fonts["title"].render(f"Крихти: {format_number(game.crumbs)}", True, ACCENT_GOLD)
+        stat_cps = fonts["main"].render(f"Всього пасив: {format_number(game.get_total_passive_income())}/с", True, TEXT_WHITE)
+        stat_click = fonts["main"].render(f"Сила кліку: +{format_number(game.get_effective_click_power())}", True, TEXT_WHITE)
+        screen.blit(crumb_title, (left_panel_x + 15, 56))
+        screen.blit(stat_cps, (left_panel_x + 15, 88))
+        screen.blit(stat_click, (left_panel_x + 15, 114))
 
         curse_val = game.curse_level
         if curse_val > 0 or game.current_location.curse_rate > 0:
-            bar_w, bar_h = 240, 10
-            pygame.draw.rect(screen, (30, 30, 30), (30, 148, bar_w, bar_h), border_radius=4)
+            bar_w, bar_h = left_panel_w - 30, 10
+            pygame.draw.rect(screen, (30, 30, 30), (left_panel_x + 15, 146, bar_w, bar_h), border_radius=4)
             fill_w = int((min(100.0, curse_val) / 100.0) * bar_w)
-            pygame.draw.rect(screen, (170, 30, 45), (30, 148, fill_w, bar_h), border_radius=4)
+            pygame.draw.rect(screen, (170, 30, 45), (left_panel_x + 15, 146, fill_w, bar_h), border_radius=4)
             curse_lbl = fonts["small"].render(f"Цвіль світу: {int(curse_val)}%", True, (220, 100, 100))
-            screen.blit(curse_lbl, (30, 164))
+            screen.blit(curse_lbl, (left_panel_x + 15, 162))
         else:
             safe_lbl = fonts["small"].render("Цвіль: 0% (Стерильна зона)", True, (140, 220, 150))
-            screen.blit(safe_lbl, (30, 164))
+            screen.blit(safe_lbl, (left_panel_x + 15, 162))
 
-        # Досягнення
-        ach_btn_rect = pygame.Rect(25, 195, 135, 34)
+        # Ряд 1: Досягнення та Скарбниця
+        btn_half_w = (left_panel_w - 30) // 2
+        ach_btn_rect = pygame.Rect(left_panel_x + 10, 196, btn_half_w, 32)
         unclaimed_count = len(game.unlocked_achievements - game.claimed_achievements)
         btn_ach_col = (85, 60, 30) if unclaimed_count > 0 else (55, 45, 60)
         pygame.draw.rect(screen, btn_ach_col, ach_btn_rect, border_radius=6)
         pygame.draw.rect(screen, ACCENT_GOLD if unclaimed_count > 0 else (150, 110, 170), ach_btn_rect, width=2 if unclaimed_count > 0 else 1, border_radius=6)
         ach_badge = f" (+{unclaimed_count})" if unclaimed_count > 0 else ""
-        ach_txt = fonts["small"].render(f"Досягн. ({game.medals} мед.){ach_badge}", True, ACCENT_GOLD if unclaimed_count > 0 else TEXT_WHITE)
+        ach_txt = fonts["small"].render(f"Досягн.{ach_badge}", True, ACCENT_GOLD if unclaimed_count > 0 else TEXT_WHITE)
         screen.blit(ach_txt, (ach_btn_rect.centerx - ach_txt.get_width() // 2, ach_btn_rect.centery - ach_txt.get_height() // 2))
 
-        # Дерево
-        p_btn_rect = pygame.Rect(170, 195, 145, 34)
-        is_ready = (curse_val >= MOLD_THRESHOLD_TREE)
+        art_btn_rect = pygame.Rect(left_panel_x + 10 + btn_half_w + 10, 196, btn_half_w, 32)
+        pygame.draw.rect(screen, (45, 65, 50), art_btn_rect, border_radius=6)
+        pygame.draw.rect(screen, (120, 220, 140), art_btn_rect, width=1, border_radius=6)
+        art_btn_txt = fonts["small"].render(f"Артефакти ({game.medals})", True, (190, 240, 190))
+        screen.blit(art_btn_txt, (art_btn_rect.centerx - art_btn_txt.get_width() // 2, art_btn_rect.centery - art_btn_txt.get_height() // 2))
+
+        # Ряд 2: Дерево Престижу та Меню
+        p_btn_rect = pygame.Rect(left_panel_x + 10, 234, btn_half_w, 32)
+        is_ready = (curse_val >= 100.0)
         pygame.draw.rect(surface=screen, color=(75, 45, 60) if is_ready else (45, 35, 42), rect=p_btn_rect, border_radius=6)
-        pygame.draw.rect(surface=screen, color=ACCENT_GOLD if is_ready else (85, 70, 78), rect=p_btn_rect, width=2, border_radius=6)
-        p_btn_txt = fonts["small"].render(f"Дерево ({game.prestige.relics} Сух.)", True, TEXT_WHITE)
+        pygame.draw.rect(surface=screen, color=ACCENT_GOLD if is_ready else (85, 70, 78), rect=p_btn_rect, width=2 if is_ready else 1, border_radius=6)
+        p_btn_txt = fonts["small"].render(f"Дерево ({format_number(game.prestige.relics)})", True, TEXT_WHITE)
         screen.blit(p_btn_txt, (p_btn_rect.centerx - p_btn_txt.get_width() // 2, p_btn_rect.centery - p_btn_txt.get_height() // 2))
 
-        # Меню
-        s_btn_rect = pygame.Rect(25, 236, 290, 28)
+        s_btn_rect = pygame.Rect(left_panel_x + 10 + btn_half_w + 10, 234, btn_half_w, 32)
         pygame.draw.rect(screen, BUTTON_BG, s_btn_rect, border_radius=6)
         pygame.draw.rect(screen, PANEL_BORDER, s_btn_rect, width=1, border_radius=6)
-        s_txt = fonts["small"].render("Меню & Налаштування", True, TEXT_WHITE)
+        s_txt = fonts["small"].render("Меню", True, TEXT_WHITE)
         screen.blit(s_txt, (s_btn_rect.centerx - s_txt.get_width() // 2, s_btn_rect.centery - s_txt.get_height() // 2))
 
-        # --- Центровані Віджети Зверху (Кліки та Всього Випечено) ---
-        widget_w, widget_h = 185, 48
-        center_available_w = (cur_w - shop_w)
+        # --- Центровані Віджети Зверху ---
+        widget_w = min(200, (center_space_right - center_space_left - 30) // 2)
+        widget_h = 48
+        center_mid_x = center_space_left + (center_space_right - center_space_left) // 2
         
-        # 1. Віджет Фізичних Кліків (зліва по центру)
-        clicks_rect = pygame.Rect(center_available_w // 2 - widget_w - 8, 15, widget_w, widget_h)
+        # 1. Віджет Фізичних Кліків
+        clicks_rect = pygame.Rect(center_mid_x - widget_w - 8, 15, widget_w, widget_h)
         pulse_clicks_bg = (90, 65, 30) if click_anim_timer > 0 else (28, 22, 26)
         pygame.draw.rect(screen, pulse_clicks_bg, clicks_rect, border_radius=10)
         pygame.draw.rect(screen, ACCENT_GOLD if click_anim_timer > 0 else PANEL_BORDER, clicks_rect, width=2, border_radius=10)
 
-        clicks_str = f"Кліків: {game.total_clicks:,}".replace(",", " ")
+        clicks_str = f"Кліків: {format_number(game.total_clicks)}"
         clicks_txt = fonts["title"].render(clicks_str, True, (255, 235, 140) if click_anim_timer > 0 else TEXT_WHITE)
         screen.blit(clicks_txt, (clicks_rect.centerx - clicks_txt.get_width() // 2, clicks_rect.centery - clicks_txt.get_height() // 2))
 
-        # 2. Віджет Загального Видобутку за всю гру (справа по центру)
-        total_baked_rect = pygame.Rect(center_available_w // 2 + 8, 15, widget_w, widget_h)
+        # 2. Віджет Загального Видобутку за всю гру
+        total_baked_rect = pygame.Rect(center_mid_x + 8, 15, widget_w, widget_h)
         pygame.draw.rect(screen, (32, 24, 28), total_baked_rect, border_radius=10)
         pygame.draw.rect(screen, (160, 120, 60), total_baked_rect, width=2, border_radius=10)
 
-        top_baked_str = f"Всього: {int(game.total_baked):,}".replace(",", " ")
+        top_baked_str = f"Всього: {format_number(game.total_baked)}"
         top_baked_txt = fonts["title"].render(top_baked_str, True, ACCENT_GOLD)
         screen.blit(top_baked_txt, (total_baked_rect.centerx - top_baked_txt.get_width() // 2, total_baked_rect.centery - top_baked_txt.get_height() // 2))
 
@@ -1024,7 +1202,7 @@ while running:
         pygame.draw.rect(screen, PANEL_BG, panel_rect, border_radius=12)
         pygame.draw.rect(screen, PANEL_BORDER, panel_rect, width=2, border_radius=12)
 
-        shop_header = fonts["title"].render(f"Ринок: {game.current_location.name[:12]}", True, TEXT_WHITE)
+        shop_header = fonts["title"].render(f"Ринок: {game.current_location.name[:16]}", True, TEXT_WHITE)
         screen.blit(shop_header, (shop_x + 20, 35))
 
         shop_clip = pygame.Rect(shop_x + 10, 75, shop_w - 20, cur_h - 105)
@@ -1048,15 +1226,15 @@ while running:
             pygame.draw.rect(screen, border_col, btn_rect, width=2, border_radius=8)
 
             if is_secret_open:
-                name_txt = fonts["main"].render(f"{upg['name']} [{upg['count']}]", True, TEXT_WHITE)
+                name_txt = fonts["main"].render(f"{upg['name']} [{format_number(upg['count'])}]", True, TEXT_WHITE)
                 desc_txt = fonts["small"].render(upg["desc"], True, (170, 160, 165))
-                cost_txt = fonts["small"].render(f"Ціна: {upg['cost']} кр.", True, ACCENT_GOLD if can_afford else (170, 90, 90))
+                cost_txt = fonts["small"].render(f"Ціна: {format_number(upg['cost'])} кр.", True, ACCENT_GOLD if can_afford else (170, 90, 90))
 
                 screen.blit(name_txt, (btn_rect.x + 12, btn_rect.y + 8))
                 screen.blit(desc_txt, (btn_rect.x + 12, btn_rect.y + 32))
                 screen.blit(cost_txt, (btn_rect.x + 12, btn_rect.y + 54))
             else:
-                sec_txt = fonts["main"].render("🔒 СЕКРЕТНА БУДІВЛЯ", True, (210, 130, 140))
+                sec_txt = fonts["main"].render("[!] СЕКРЕТНА БУДІВЛЯ", True, (210, 130, 140))
                 req_perk_name = game.prestige.tree_config[upg['secret_req']]['name']
                 desc_s = fonts["small"].render(f"Потрібен перк: {req_perk_name}", True, (140, 110, 120))
                 screen.blit(sec_txt, (btn_rect.x + 12, btn_rect.y + 18))
@@ -1069,7 +1247,9 @@ while running:
         notification_banner.draw(screen, fonts["main"], fonts["small"], cur_w)
 
         # Модалки
-        if show_achievements_hub:
+        if show_artifacts_hub:
+            draw_artifacts_hub(screen, mouse_pos)
+        elif show_achievements_hub:
             draw_achievements_hub(screen, mouse_pos)
         elif show_locations_hub:
             draw_locations_hub(screen, mouse_pos)
